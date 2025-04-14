@@ -1,11 +1,12 @@
 import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/table";
-import TableSearch from "@/components/TableSearch";
-import { role, teachersData } from "@/lib/data";
+// import TableSearch from "@/components/TableSearch";
+import { teachersData } from "@/lib/data";
 import Image from "next/image";
 import Link from "next/link";
-
+import CreateTeacherButton from "./_components/CreateTeacherButton";
+import { cookies } from "next/headers";
 type Teacher = {
   id: number;
   teacherId: string;
@@ -54,7 +55,10 @@ const columns = [
   },
 ];
 
-const TeacherListPage = () => {
+const TeacherListPage = async () => {
+  const cookieStore = await cookies();
+  const role = cookieStore.get("role")?.value;
+
   const renderRow = (item: Teacher) => (
     <tr
       key={item.id}
@@ -85,7 +89,7 @@ const TeacherListPage = () => {
               <Image src="/view.png" alt="" width={16} height={16} />
             </button>
           </Link>
-          {role === "admin" && (
+          {role === "Administrator" && (
             // <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaPurple">
             //   <Image src="/delete.png" alt="" width={16} height={16} />
             // </button>
@@ -102,7 +106,8 @@ const TeacherListPage = () => {
       <div className="flex items-center justify-between">
         <h1 className="hidden md:block text-lg font-semibold">All Teachers</h1>
         <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <TableSearch />
+          {/* <TableSearch /> */}
+          {role === "Administrator" && <CreateTeacherButton />}
           <div className="flex items-center gap-4 self-end">
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/filter.png" alt="" width={14} height={14} />
@@ -110,7 +115,7 @@ const TeacherListPage = () => {
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" && (
+            {role === "Administrator" && (
               // <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               //   <Image src="/plus.png" alt="" width={14} height={14} />
               // </button>

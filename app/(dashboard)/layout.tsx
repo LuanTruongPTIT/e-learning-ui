@@ -2,8 +2,8 @@ import Menu from "@/components/Menu";
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import Link from "next/link";
-
-export default function DashboardLayout({
+import { cookies } from "next/headers";
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -43,10 +43,12 @@ function Header() {
   );
 }
 
-function Sidebar() {
+async function Sidebar() {
+  const cookieStore = await cookies();
+  const role = cookieStore.get("role");
   return (
     <div className="w-[14%] md:w-[8%] lg:w-[16%] xl:w-[14%] px-4 pb-4 pt-1">
-      <Menu />
+      <Menu role={role?.value || "Administrator"} />
     </div>
   );
 }
