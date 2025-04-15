@@ -43,7 +43,8 @@ import {
   TeacherFormValues,
 } from "@/app/schema/users-schema";
 import Image from "next/image";
-import { GetCourseDepartment } from "@/apis/teacher";
+import { CreateTeacher, GetCourseDepartment } from "@/apis/teacher";
+import { toast } from "react-toastify";
 // const subjects = [
 //   { id: "math", label: "Mathematics" },
 //   { id: "physics", label: "Physics" },
@@ -156,15 +157,16 @@ export default function CreateTeacherForm({
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await CreateTeacher(data);
 
       console.log("Form data prepared for API submission:", data);
-
-      // Show success message or redirect
-      // if (onSuccess) {
-      //   onSuccess();
-      // }
+      if (response.status === 200) {
+        toast.success("Teacher created successfully!");
+      }
+      onSuccess?.();
     } catch (error) {
       console.error("Error submitting form:", error);
+      toast.error("Failed to create teacher. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -241,9 +243,9 @@ export default function CreateTeacherForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="1">Male</SelectItem>
+                      <SelectItem value="2">Female</SelectItem>
+                      <SelectItem value="3">Other</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -369,8 +371,8 @@ export default function CreateTeacherForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="1">Active</SelectItem>
+                      <SelectItem value="2">Inactive</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -408,33 +410,6 @@ export default function CreateTeacherForm({
                             {subject.department_name}
                           </SelectItem>
                         ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select role" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="lecturer">Lecturer</SelectItem>
-                      <SelectItem value="assistant">Student</SelectItem>
-                      <SelectItem value="head">Head of Department</SelectItem>
-                      <SelectItem value="professor">Professor</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

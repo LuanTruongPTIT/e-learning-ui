@@ -1,3 +1,4 @@
+import { TeacherFormValues } from "@/app/schema/users-schema";
 import { IApiResponse } from "@/interfaces/api-response";
 import axiosInstance, { endpoints } from "@/lib/axios";
 
@@ -12,6 +13,22 @@ export const GetCourseDepartment = async (): Promise<
 > => {
   const result = await axiosInstance.get(
     endpoints.course.get_course_departments,
+    {
+      withCredentials: true,
+    }
+  );
+
+  return result.data;
+};
+
+export const CreateTeacher = async (
+  data: TeacherFormValues
+): Promise<IApiResponse<string>> => {
+  const result = await axiosInstance.post(
+    endpoints.teacher.create_teacher,
+    {
+      ...data,
+    },
     {
       withCredentials: true,
     }

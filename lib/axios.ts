@@ -57,6 +57,9 @@ export const endpoints = {
   course: {
     get_course_departments: `program/course-department`,
   },
+  teacher: {
+    create_teacher: `users/create-teacher`,
+  },
 
   user: {
     get: `${VERSION_PREFIX}/users`,

@@ -18,7 +18,7 @@ export const teacherFormSchema = z.object({
     .min(10, { message: "Phone number must be at least 10 digits" })
     .optional()
     .or(z.literal("")),
-  gender: z.enum(["male", "female", "other"], {
+  gender: z.enum(["1", "2", "3"], {
     required_error: "Please select a gender",
   }),
   birthday: z.date({
@@ -31,15 +31,15 @@ export const teacherFormSchema = z.object({
     .string()
     .min(8, { message: "Password must be at least 8 characters" }),
 
-  status: z.enum(["active", "inactive"], {
+  status: z.enum(["1", "2"], {
     required_error: "Please select a status",
   }),
   department: z.string({
     required_error: "Please select a department",
   }),
-  role: z.string({
-    required_error: "Please select a role",
-  }),
+  // role: z.string({
+  //   required_error: "Please select a role",
+  // }),
   subjects: z
     .array(z.string())
     .min(1, { message: "Please select at least one subject" }),

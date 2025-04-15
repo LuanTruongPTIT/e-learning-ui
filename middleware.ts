@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
     if (token) {
       // Redirect authenticated users based on their role
       if (role === "Administrator") {
-        return NextResponse.redirect(new URL("/admin", request.url));
+        return NextResponse.redirect(new URL("/teacher", request.url));
       } else if (role === "Lecturer") {
         return NextResponse.redirect(new URL("/teacher", request.url));
       } else if (role === "Student") {
@@ -26,18 +26,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
-  // Role-based route protection
-  if (path.startsWith("/admin") && role !== "Administrator") {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
-  }
+  // // Role-based route protection
+  // if (path.startsWith("/admin") && role !== "Administrator") {
+  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
+  // }
 
-  if (path.startsWith("/teacher") && role !== "Lecturer") {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
-  }
+  // if (path.startsWith("/teacher") && role !== "Lecturer") {
+  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
+  // }
 
-  if (path.startsWith("/student") && role !== "Student") {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
-  }
+  // if (path.startsWith("/student") && role !== "Student") {
+  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
+  // }
 
   return NextResponse.next();
 }
