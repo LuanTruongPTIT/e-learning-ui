@@ -20,6 +20,19 @@ export function middleware(request: NextRequest) {
     }
     return NextResponse.next();
   }
+  if (path === "/") {
+    if (token) {
+      if (role === "Administrator") {
+        return NextResponse.redirect(new URL("/admin", request.url));
+      } else if (role === "Teacher") {
+        return NextResponse.redirect(new URL("/teacher", request.url));
+      } else if (role === "Student") {
+        return NextResponse.redirect(new URL("/student", request.url));
+      }
+    } else {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
+    }
+  }
 
   // Protected routes - require authentication
   if (!token) {
