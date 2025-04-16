@@ -41,7 +41,7 @@ export default function LoginPage() {
         setRole(result.data.role);
         if (result.data.role == "Administrator") {
           router.push("/admin");
-        } else if (result.data.role == "Lecturer") {
+        } else if (result.data.role == "Teacher") {
           router.push("/teacher");
         } else if (result.data.role == "Student") {
           router.push("/student");

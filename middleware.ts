@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
       // Redirect authenticated users based on their role
       if (role === "Administrator") {
         return NextResponse.redirect(new URL("/teacher", request.url));
-      } else if (role === "Lecturer") {
+      } else if (role === "Teacher") {
         return NextResponse.redirect(new URL("/teacher", request.url));
       } else if (role === "Student") {
         return NextResponse.redirect(new URL("/student", request.url));
@@ -44,7 +44,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
 
-  if (path.startsWith("/teacher") && role !== "Lecturer") {
+  if (path.startsWith("/teacher") && role !== "Teacher") {
     return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
 
