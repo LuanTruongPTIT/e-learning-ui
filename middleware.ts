@@ -27,17 +27,17 @@ export function middleware(request: NextRequest) {
   }
 
   // // Role-based route protection
-  // if (path.startsWith("/admin") && role !== "Administrator") {
-  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
-  // }
+  if (path.startsWith("/admin") && role !== "Administrator") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
 
-  // if (path.startsWith("/teacher") && role !== "Lecturer") {
-  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
-  // }
+  if (path.startsWith("/teacher") && role !== "Lecturer") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
 
-  // if (path.startsWith("/student") && role !== "Student") {
-  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
-  // }
+  if (path.startsWith("/student") && role !== "Student") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
 
   return NextResponse.next();
 }
