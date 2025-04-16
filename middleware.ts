@@ -44,5 +44,11 @@ export function middleware(request: NextRequest) {
 
 // Configure which routes to run middleware on
 export const config = {
-  matcher: ["/admin/:path*", "/teacher/:path*", "/student/:path*", "/sign-in"],
+  matcher: [
+    "/",
+    "/admin/:path*",
+    "/teacher/:path*",
+    "/student/:path*",
+    "/sign-in",
+  ],
 };
