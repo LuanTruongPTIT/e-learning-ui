@@ -27,18 +27,24 @@ import {
   Users,
   BookOpen,
   GraduationCap,
+  Plus,
 } from "lucide-react";
 import { format } from "date-fns";
 import type { Course } from "@/types/course";
+import { Button } from "@/components/ui/button";
 
 interface AssignedCoursesListProps {
   courses: Course[];
   onCourseSelect: (course: Course) => void;
+  isModalOpen: boolean;
+  setIsModalOpen: (isOpen: boolean) => void;
 }
 
 export default function AssignedCoursesList({
   courses,
   onCourseSelect,
+  isModalOpen,
+  setIsModalOpen,
 }: AssignedCoursesListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -93,6 +99,12 @@ export default function AssignedCoursesList({
           <p className="text-muted-foreground mt-1">
             Manage courses you've been assigned to teach
           </p>
+        </div>
+        <div>
+          <Button onClick={() => setIsModalOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Course
+          </Button>
         </div>
       </div>
 

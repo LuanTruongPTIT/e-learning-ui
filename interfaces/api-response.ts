@@ -10,4 +10,5 @@ export interface IApiResponse<T> {
   paging?: IPaging;
   total?: number;
   filter?: Record<string, any>;
+  detail?: string;
 }

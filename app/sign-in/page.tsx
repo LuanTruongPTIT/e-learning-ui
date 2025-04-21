@@ -147,6 +147,11 @@ export default function LoginPage() {
           className="w-full bg-blue-700 hover:bg-blue-800"
         >
           Sign In
+          {submitting && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-t-transparent border-r-transparent border-b-transparent border-l-blue-500" />
+            </div>
+          )}
         </Button>
       </form>
 

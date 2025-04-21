@@ -43,6 +43,9 @@ export function middleware(request: NextRequest) {
   if (path.startsWith("/admin") && role !== "Administrator") {
     return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
+  if (path.startsWith("/list/teachers") && role !== "Administrator") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
 
   if (path.startsWith("/teacher") && role !== "Teacher") {
     return NextResponse.redirect(new URL("/unauthorized", request.url));
@@ -50,6 +53,22 @@ export function middleware(request: NextRequest) {
 
   if (path.startsWith("/student") && role !== "Student") {
     return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+  console.log(role);
+  console.log(path);
+  if (
+    path.startsWith("/list/room") &&
+    role !== "Administrator" &&
+    role !== "Teacher"
+  ) {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+
+  if (path.startsWith("/list/teachers") && role !== "Administrator") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+  if (path.startsWith("/logout")) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
   return NextResponse.next();
@@ -63,5 +82,8 @@ export const config = {
     "/teacher/:path*",
     "/student/:path*",
     "/sign-in",
+    "/list/room/:path*",
+    "/logout",
+    "/list/teachers/:path*",
   ],
 };

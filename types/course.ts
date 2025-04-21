@@ -50,3 +50,10 @@ export interface Course {
   assignedBy: string;
   assignedDate: Date;
 }
+
+export interface Courses_By_Department {
+  id: string;
+  name: string;
+  code: string;
+  department_id: string;
+}

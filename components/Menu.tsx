@@ -2,6 +2,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 const menuItems = [
   {
     title: "MENU",
@@ -16,7 +18,7 @@ const menuItems = [
         icon: "/teacher.png",
         label: "Teachers",
         href: "/list/teachers",
-        visible: ["Administrator", "Teacher"],
+        visible: ["Administrator"],
       },
       {
         icon: "/student.png",
@@ -33,8 +35,8 @@ const menuItems = [
       {
         icon: "/class.png",
         label: "Classes",
-        href: "/list/classes",
-        visible: ["Administrator", "teacher"],
+        href: "/list/room",
+        visible: ["Administrator", "Teacher"],
       },
       {
         icon: "/lesson.png",
@@ -110,11 +112,32 @@ interface MenuProps {
   role: string;
 }
 const Menu = ({ role }: MenuProps) => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
   const signOut = async () => {
-    Cookies.remove("token");
-    Cookies.remove("role");
-    window.location.href = "/sign-in";
+    try {
+      setLoading(true); // nếu có loading state
+
+      // Gọi API logout nếu cần
+      // await logoutAPI();
+
+      // Xóa cookies
+      Cookies.remove("token");
+      Cookies.remove("role");
+
+      // Cleanup các state khác nếu cần
+      // dispatch(clearUserState());
+
+      // Chuyển hướng
+      router.replace("/sign-in");
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <div className="mt-4 text-sm">
       {menuItems.map((i) => (

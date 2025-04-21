@@ -1,31 +1,42 @@
-"use client";
-
 import axios, { AxiosRequestConfig } from "axios";
-import { useRouter } from "next/navigation";
 import { HOST_API } from "./global-config";
-
+import Cookies from "js-cookie";
 //----------------------------------------------------------------------
 console.log(HOST_API);
 const axiosInstance = axios.create({ baseURL: HOST_API });
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = sessionStorage.getItem("token");
-    if (token && config.headers) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+    const token = Cookies.get("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
-
+axiosInstance.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    console.error("Interceptor error:", error); // ❗ thêm dòng này
+    if (error.response && error.response.status === 401) {
+      if (typeof window !== "undefined") {
+        window.location.href = "/sign-in";
+      }
+    }
+    return Promise.reject(
+      (error.response && error.response.data) || "Something went wrong"
+    );
+  }
+);
 axiosInstance.interceptors.response.use(
   (res) => res,
   (error) => {
     if (error.response && error.response.status === 401) {
       if (typeof window !== "undefined") {
-        const router = useRouter();
-        router.push("/sign-in");
+        window.location.href = "/sign-in"; // ✅ dùng thẳng window
       }
     }
     return Promise.reject(
@@ -56,53 +67,20 @@ export const endpoints = {
   },
   course: {
     get_course_departments: `program/course-department`,
+    get_total_course_by_department: `program/get-program-by-department`,
   },
   teacher: {
     create_teacher: `users/create-teacher`,
+    get_teacher_by_admin: `users/teachers`,
   },
-
-  user: {
-    get: `${VERSION_PREFIX}/users`,
-    create: `${VERSION_PREFIX}/users`,
-    update: `${VERSION_PREFIX}/profile`,
-    profile: `${VERSION_PREFIX}/profile`,
-    bookmark: (id: string) => `${VERSION_PREFIX}/users/${id}/saved-posts`,
-    followers: (id: string) => `${VERSION_PREFIX}/users/${id}/followers`,
-    followings: (id: string) => `${VERSION_PREFIX}/users/${id}/followings`,
-    follow: (id: string) => `${VERSION_PREFIX}/users/${id}/follow`,
-    unfollow: (id: string) => `${VERSION_PREFIX}/users/${id}/unfollow`,
-    profileById: (id: string) => `${VERSION_PREFIX}/users/${id}`,
-    hasFollowed: (id: string) => `${VERSION_PREFIX}/users/${id}/has-followed`,
+  department: {
+    get_departments: `program/department`,
   },
-
-  post: {
-    get: `${VERSION_PREFIX}/posts`,
-    create: `${VERSION_PREFIX}/posts`,
-    update: (id: string) => `${VERSION_PREFIX}/posts/${id}`,
-    delete: (id: string) => `${VERSION_PREFIX}/posts/${id}`,
-    detail: `${VERSION_PREFIX}/posts/:id`,
-    like: (id: string) => `${VERSION_PREFIX}/posts/${id}/like`,
-    unlike: (id: string) => `${VERSION_PREFIX}/posts/${id}/unlike`,
-    save: (id: string) => `${VERSION_PREFIX}/posts/${id}/save`,
-    unsave: (id: string) => `${VERSION_PREFIX}/posts/${id}/unsave`,
+  class: {
+    create_class: `room/create-class`,
   },
-  media: {
-    upload: `${VERSION_PREFIX}/upload-file`,
-  },
-
-  topic: {
-    get: `${VERSION_PREFIX}/topics`,
-    detail: `${VERSION_PREFIX}/topics/:id`,
-    create: `${VERSION_PREFIX}/topics`,
-  },
-
-  notification: {
-    get: `${VERSION_PREFIX}/notifications`,
-    read: (id: string) => `${VERSION_PREFIX}/notifications/${id}/read`,
-    readAll: `${VERSION_PREFIX}/notifications/read-all`,
-  },
-
-  comment: {
-    get: `${VERSION_PREFIX}/comments`,
+  room: {
+    get_classes: `room/classes`,
+    get_classes_by_department_of_teacher: `room/classes-by-department-of-teacher`,
   },
 };

@@ -5,6 +5,7 @@ import type { Course } from "@/types/course";
 import InstructorHeader from "./instructor-header";
 import CourseDetailView from "./course-detail-view";
 import AssignedCoursesList from "./assigned-courses-list";
+import CreateCourseModal from "../create-course/create-course-modal";
 
 // Mock data for instructor assigned courses
 const mockAssignedCourses: Course[] = [
@@ -116,6 +117,7 @@ export default function DashboardLayout() {
   const [courses, setCourses] = useState<Course[]>(mockAssignedCourses);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const handleCourseSelect = (course: Course) => {
     setSelectedCourse(course);
   };
@@ -148,8 +150,16 @@ export default function DashboardLayout() {
           <AssignedCoursesList
             courses={courses}
             onCourseSelect={handleCourseSelect}
+            isModalOpen={isCreateModalOpen}
+            setIsModalOpen={setIsCreateModalOpen}
           />
         )}
+        <CreateCourseModal
+          isOpen={isCreateModalOpen}
+          onClose={() => {
+            setIsCreateModalOpen(false);
+          }}
+        />
       </main>
     </div>
   );
