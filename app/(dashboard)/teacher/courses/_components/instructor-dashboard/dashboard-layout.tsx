@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Course } from "@/types/course";
 import InstructorHeader from "./instructor-header";
 import CourseDetailView from "./course-detail-view";
 import AssignedCoursesList from "./assigned-courses-list";
 import CreateCourseModal from "../create-course/create-course-modal";
+import {
+  getTeachingAssignCourses,
+  TeachingAssignCourseResponse,
+} from "@/apis/teacher";
 
 // Mock data for instructor assigned courses
 const mockAssignedCourses: Course[] = [
@@ -114,9 +118,21 @@ const mockAssignedCourses: Course[] = [
 ];
 
 export default function DashboardLayout() {
-  const [courses, setCourses] = useState<Course[]>(mockAssignedCourses);
+  const [courses, setCourses] = useState<TeachingAssignCourseResponse[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await getTeachingAssignCourses();
+        setCourses(response.data);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
+    };
+
+    fetchCourses();
+  }, []);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const handleCourseSelect = (course: Course) => {
     setSelectedCourse(course);
@@ -126,14 +142,14 @@ export default function DashboardLayout() {
     setSelectedCourse(null);
   };
 
-  const handleCourseUpdate = (updatedCourse: Course) => {
-    setCourses(
-      courses.map((course) =>
-        course.id === updatedCourse.id ? updatedCourse : course
-      )
-    );
-    setSelectedCourse(updatedCourse);
-  };
+  // const handleCourseUpdate = (updatedCourse: Course) => {
+  //   setCourses(
+  //     courses.map((course) =>
+  //       course.id === updatedCourse.id ? updatedCourse : course
+  //     )
+  //   );
+  //   setSelectedCourse(updatedCourse);
+  // };
 
   return (
     <div className="min-h-screen bg-[#f5f9fc]">
@@ -144,7 +160,7 @@ export default function DashboardLayout() {
           <CourseDetailView
             course={selectedCourse}
             onBack={handleBackToDashboard}
-            onCourseUpdate={handleCourseUpdate}
+            // onCourseUpdate={handleCourseUpdate}
           />
         ) : (
           <AssignedCoursesList

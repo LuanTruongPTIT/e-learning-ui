@@ -32,14 +32,14 @@ import TeachingPlans from "./teaching-plans";
 interface CourseDetailViewProps {
   course: Course;
   onBack: () => void;
-  onCourseUpdate: (updatedCourse: Course) => void;
+  // onCourseUpdate: (updatedCourse: Course) => void;
 }
 
 export default function CourseDetailView({
   course,
   onBack,
-  onCourseUpdate,
-}: CourseDetailViewProps) {
+}: // onCourseUpdate,
+CourseDetailViewProps) {
   const [activeTab, setActiveTab] = useState("materials");
 
   const getStatusBadgeVariant = (status: string) => {
@@ -69,7 +69,7 @@ export default function CourseDetailView({
       ...course,
       students,
       studentsCount: students.length,
-      lastUpdated: new Date(),
+      lastUpdatced: new Date(),
     });
   };
 

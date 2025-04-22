@@ -20,7 +20,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import {
   Calendar,
-  Clock,
   FileText,
   Filter,
   Search,
@@ -30,12 +29,13 @@ import {
   Plus,
 } from "lucide-react";
 import { format } from "date-fns";
-import type { Course } from "@/types/course";
 import { Button } from "@/components/ui/button";
+import { TeachingAssignCourseResponse } from "@/apis/teacher";
+import Image from "next/image";
 
 interface AssignedCoursesListProps {
-  courses: Course[];
-  onCourseSelect: (course: Course) => void;
+  courses: TeachingAssignCourseResponse[];
+  onCourseSelect: (course: TeachingAssignCourseResponse) => void;
   isModalOpen: boolean;
   setIsModalOpen: (isOpen: boolean) => void;
 }
@@ -52,30 +52,41 @@ export default function AssignedCoursesList({
   const [sortBy, setSortBy] = useState("lastUpdated");
 
   // Get unique departments for filter
-  const departments = Array.from(
-    new Set(courses.map((course) => course.department))
-  );
+  // const departments = Array.from(
+  //   new Set(courses.map((course) => course.department))
+  // );
 
   // Filter and sort courses
   const filteredCourses = courses
-    .filter(
-      (course) =>
-        (course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          course.description
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase())) &&
-        (statusFilter === "all" || course.status === statusFilter) &&
-        (departmentFilter === "all" || course.department === departmentFilter)
-    )
+    .filter((course) => {
+      const matchesSearch =
+        course.course_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === "all" || course.status === statusFilter;
+
+      // const matchesDepartment =
+      //   departmentFilter === "all" || course.department === departmentFilter;
+
+      // return matchesSearch && matchesStatus && matchesDepartment;
+      return matchesSearch && matchesStatus;
+    })
     .sort((a, b) => {
-      if (sortBy === "lastUpdated") {
-        return b.lastUpdated.getTime() - a.lastUpdated.getTime();
-      } else if (sortBy === "title") {
-        return a.title.localeCompare(b.title);
-      } else if (sortBy === "startDate") {
-        return a.startDate.getTime() - b.startDate.getTime();
+      switch (sortBy) {
+        case "lastUpdated":
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        case "title":
+          return a.course_name.localeCompare(b.course_name);
+        case "startDate":
+          return (
+            new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+          );
+        default:
+          return 0;
       }
-      return 0;
     });
 
   const getStatusBadgeVariant = (status: string) => {
@@ -97,7 +108,7 @@ export default function AssignedCoursesList({
         <div>
           <h1 className="text-2xl font-bold">My Assigned Courses</h1>
           <p className="text-muted-foreground mt-1">
-            Manage courses you've been assigned to teach
+            Manage courses you&apos;ve been assigned to teach
           </p>
         </div>
         <div>
@@ -139,11 +150,11 @@ export default function AssignedCoursesList({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Departments</SelectItem>
-              {departments.map((dept) => (
+              {/* {departments.map((dept) => (
                 <SelectItem key={dept} value={dept}>
                   {dept}
                 </SelectItem>
-              ))}
+              ))} */}
             </SelectContent>
           </Select>
 
@@ -167,7 +178,7 @@ export default function AssignedCoursesList({
           <p className="text-muted-foreground mt-1 mb-4">
             {searchQuery || statusFilter !== "all" || departmentFilter !== "all"
               ? "Try adjusting your search or filters"
-              : "You haven't been assigned any courses yet"}
+              : "You haven&apos;t been assigned any courses yet"}
           </p>
         </div>
       ) : (
@@ -179,10 +190,11 @@ export default function AssignedCoursesList({
               onClick={() => onCourseSelect(course)}
             >
               <div className="h-36 bg-secondary/50 relative">
-                <img
-                  src={course.thumbnail || "/placeholder.svg"}
-                  alt={course.title}
-                  className="w-full h-full object-cover"
+                <Image
+                  src={course.thumbnail_url || "/placeholder.svg"}
+                  alt={course.course_name}
+                  className="object-cover"
+                  fill
                 />
                 <Badge
                   variant="outline"
@@ -194,7 +206,7 @@ export default function AssignedCoursesList({
                 </Badge>
               </div>
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">{course.title}</CardTitle>
+                <CardTitle className="text-lg">{course.course_name}</CardTitle>
                 <CardDescription className="line-clamp-2">
                   {course.description}
                 </CardDescription>
@@ -203,31 +215,32 @@ export default function AssignedCoursesList({
                 <div className="flex items-center text-sm text-muted-foreground mb-1">
                   <Calendar className="h-4 w-4 mr-1" />
                   <span>
-                    {format(course.startDate, "MMM d, yyyy")} -{" "}
-                    {format(course.endDate, "MMM d, yyyy")}
+                    {format(new Date(course.start_date), "MMM d, yyyy")} -{" "}
+                    {format(new Date(course.end_date), "MMM d, yyyy")}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <div className="flex items-center">
                     <Users className="h-4 w-4 mr-1 text-primary" />
-                    <span>{course.studentsCount} students</span>
+                    {/* <span>{course.students_count || 0} students</span> */}
+                    <span>0 students</span>
                   </div>
                   <div className="flex items-center">
                     <FileText className="h-4 w-4 mr-1 text-primary" />
-                    <span>{course.materialsCount} materials</span>
+                    {/* <span>{course.materials_count || 0} materials</span> */}
+                    <span>0 materials</span>
                   </div>
                 </div>
                 <div className="mt-2 text-xs text-muted-foreground">
                   <span className="font-medium">Department:</span>{" "}
-                  {course.department}
+                  {/* {course.department || "N/A"} */}
+                  N/A
                 </div>
               </CardContent>
               <CardFooter className="border-t pt-3 text-xs text-muted-foreground">
                 <div className="flex items-center">
-                  <Clock className="h-3 w-3 mr-1" />
-                  <span>
-                    Assigned on {format(course.assignedDate, "MMM d, yyyy")}
-                  </span>
+                  Last updated:{" "}
+                  {format(new Date(course.created_at), "MMM d, yyyy")}
                 </div>
               </CardFooter>
             </Card>
