@@ -188,6 +188,7 @@ export interface TeachingAssignCourse {
   description: string;
   start_date: Date;
   end_date: Date;
+  thumbnail_url: string;
 }
 export const createTeachingAssignCourse = async (
   data: TeachingAssignCourse
@@ -219,6 +220,7 @@ export interface TeachingAssignCourseResponse {
   course_code: string;
   start_date: Date;
   end_date: Date;
+  thumbnail_url: string;
   status: string;
   created_at: Date;
 }

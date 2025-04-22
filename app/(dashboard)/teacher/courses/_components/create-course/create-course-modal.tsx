@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -36,6 +37,8 @@ import {
   getCoursesByProgram,
 } from "@/apis/teacher";
 import { toast } from "react-toastify";
+import Image from "next/image";
+import { useUploadThing } from "@/lib/uploadthing";
 
 interface CreateCourseModalProps {
   isOpen: boolean;
@@ -65,7 +68,19 @@ export default function CreateCourseModal({
     course_id: "",
     startDate: undefined as unknown as Date,
     endDate: undefined as unknown as Date,
+    thumbnail: "",
   });
+
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const { startUpload } = useUploadThing("courseImage");
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    console.log(file);
+    if (file) {
+      setThumbnailFile(file);
+    }
+  };
 
   useEffect(() => {
     const fetchCourses = async (programId: string) => {
@@ -129,6 +144,7 @@ export default function CreateCourseModal({
     if (!formData.course_id) newErrors.course_id = "Subject is required";
     if (!formData.startDate) newErrors.startDate = "Start date is required";
     if (!formData.endDate) newErrors.endDate = "End date is required";
+    if (!thumbnailFile) newErrors.thumbnail = "Thumbnail is required";
 
     if (
       formData.startDate &&
@@ -142,13 +158,25 @@ export default function CreateCourseModal({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateForm()) {
-      // Here you would typically send the data to your API
-      console.log("Creating course:", {
-        ...formData,
-        status: "upcoming",
-      });
+      let thumbnailUrl = "";
+
+      if (thumbnailFile) {
+        try {
+          const uploadResult = await startUpload([thumbnailFile]); // Chỉ truyền mảng file, không cần object với endpoint
+          console.log("Upload result:", uploadResult);
+
+          if (uploadResult && uploadResult[0]) {
+            thumbnailUrl = uploadResult[0].url;
+          }
+        } catch (error) {
+          console.error("Upload error:", error);
+          toast.error("Failed to upload image");
+          return;
+        }
+      }
+
       const data = {
         course_name: formData.course_name,
         description: formData.description,
@@ -156,27 +184,31 @@ export default function CreateCourseModal({
         course_id: formData.course_id,
         start_date: formData.startDate,
         end_date: formData.endDate,
+        thumbnail_url: thumbnailUrl,
       };
-      const result = createTeachingAssignCourse(data);
-      result.then((res) => {
-        if (res.status === 200) {
+
+      try {
+        const result = await createTeachingAssignCourse(data);
+        if (result.status === 200) {
           toast.success("Course created successfully!");
+          onClose();
         } else {
           toast.error("Failed to create course.");
         }
+      } catch (error) {
+        console.error("API error:", error);
+        toast.error("Failed to create course");
+      }
+      setFormData({
+        course_name: "",
+        description: "",
+        class_id: "",
+        course_id: "",
+        startDate: undefined as unknown as Date,
+        endDate: undefined as unknown as Date,
+        thumbnail: "",
       });
     }
-
-    // Reset form and close modal
-    setFormData({
-      course_name: "",
-      description: "",
-      class_id: "",
-      course_id: "",
-      startDate: new Date(),
-      endDate: new Date(),
-    });
-    onClose();
   };
 
   return (
@@ -345,6 +377,32 @@ export default function CreateCourseModal({
                 <p className="text-sm text-red-500">{errors.endDate}</p>
               )}
             </div>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="thumbnail">Course Thumbnail</Label>
+            <div className="flex items-center gap-4">
+              {thumbnailFile && (
+                <div className="relative w-20 h-20">
+                  <Image
+                    src={URL.createObjectURL(thumbnailFile)}
+                    alt="Thumbnail preview"
+                    fill
+                    className="object-cover rounded"
+                  />
+                </div>
+              )}
+              <Input
+                id="thumbnail"
+                type="file"
+                accept="image/*"
+                onChange={handleThumbnailChange}
+                className={errors.thumbnail ? "border-red-500" : ""}
+              />
+            </div>
+            {errors.thumbnail && (
+              <p className="text-sm text-red-500">{errors.thumbnail}</p>
+            )}
           </div>
         </div>
 
