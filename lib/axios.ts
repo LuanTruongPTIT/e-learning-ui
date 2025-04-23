@@ -111,4 +111,7 @@ export const endpoints = {
     mark_lecture_completed: (lectureId: string) =>
       `student/lectures/${lectureId}/complete`,
   },
+  profile: {
+    get_current_user: `users/me`,
+  },
 };

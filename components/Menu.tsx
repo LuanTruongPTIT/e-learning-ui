@@ -24,13 +24,7 @@ const menuItems = [
         icon: "/student.png",
         label: "Students",
         href: "/list/students",
-        visible: ["Teacher"],
-      },
-      {
-        icon: "/student.png",
-        label: "Students Management",
-        href: "/admin/students",
-        visible: ["Administrator"],
+        visible: ["Administrator", "Teacher"],
       },
       {
         icon: "/subject.png",
@@ -56,43 +50,24 @@ const menuItems = [
         href: "/student/courses",
         visible: ["student"],
       },
-      {
-        icon: "/exam.png",
-        label: "Exams",
-        href: "/list/exams",
-        visible: ["Administrator", "Teacher", "student", "parent"],
-      },
-      {
-        icon: "/assignment.png",
-        label: "Assignments",
-        href: "/list/assignments",
-        visible: ["Administrator", "Teacher", "student", "parent"],
-      },
-      {
-        icon: "/result.png",
-        label: "Results",
-        href: "/list/results",
-        visible: ["Administrator", "Teacher", "student", "parent"],
-      },
-      {
-        icon: "/attendance.png",
-        label: "Attendance",
-        href: "/list/attendance",
-        visible: ["Administrator", "Teacher", "student", "parent"],
-      },
-      {
-        icon: "/calendar.png",
-        label: "Events",
-        href: "/list/events",
-        visible: ["Administrator", "Teacher", "student", "parent"],
-      },
-
-      {
-        icon: "/announcement.png",
-        label: "Announcements",
-        href: "/list/announcements",
-        visible: ["Administrator", "Teacher", "student", "parent"],
-      },
+      // {
+      //   icon: "/exam.png",
+      //   label: "Exams",
+      //   href: "/list/exams",
+      //   visible: ["Administrator", "Teacher", "student", "parent"],
+      // },
+      // {
+      //   icon: "/assignment.png",
+      //   label: "Assignments",
+      //   href: "/list/assignments",
+      //   visible: ["Administrator", "Teacher", "student", "parent"],
+      // },
+      // {
+      //   icon: "/result.png",
+      //   label: "Results",
+      //   href: "/list/results",
+      //   visible: ["Administrator", "Teacher", "student", "parent"],
+      // },
     ],
   },
   {
