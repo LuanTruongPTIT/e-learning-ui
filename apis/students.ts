@@ -15,8 +15,8 @@ export interface Student {
   address: string;
   avatar_url: string;
   date_of_birth: string;
-  gender: string;
-  account_status: string;
+  gender: number;
+  account_status: number;
   created_at: string;
   program_id?: string;
   program_name?: string;

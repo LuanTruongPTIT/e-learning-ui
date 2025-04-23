@@ -13,7 +13,7 @@ export default async function DashboardLayout({
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="w-[86%] md:w-[92%] lg:w-[84%] xl:w-[86%] bg-[#F7F8FA] overflow-scroll p-4 m-4 rounded-3xl">
+        <main className="w-[86%] md:w-[92%] lg:w-[84%] xl:w-[86%] bg-[#F7F8FA] dark:bg-gray-800 overflow-scroll p-4 m-4 rounded-3xl">
           {children}
         </main>
       </div>
@@ -23,7 +23,7 @@ export default async function DashboardLayout({
 
 function Header() {
   return (
-    <header className="bg-white shadow-md p-3 flex items-center">
+    <header className="bg-white dark:bg-gray-900 shadow-md p-3 flex items-center">
       <Link className="flex items-center gap-3" href="/">
         <Image
           src="/logo-ptit.png"
@@ -32,7 +32,7 @@ function Header() {
           height={50}
           className="rounded-full shadow-sm"
         />
-        <span className="text-lg font-semibold hidden lg:block text-gray-700">
+        <span className="text-lg font-semibold hidden lg:block text-gray-700 dark:text-gray-200">
           Posts and Telecommunication Institute of Technology
         </span>
       </Link>

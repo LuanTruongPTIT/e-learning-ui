@@ -396,18 +396,20 @@ export default function StudentsPage() {
                       </span>
                     )}
                   </TableCell>
-                  <TableCell>{student.gender}</TableCell>
+                  <TableCell>
+                    {student.gender === 1 ? "Male" : "Female"}
+                  </TableCell>
                   <TableCell>
                     <Badge
                       variant={
-                        student.account_status === "Active"
+                        student.account_status === 1
                           ? "success"
-                          : student.account_status === "Inactive"
+                          : student.account_status !== 1
                           ? "secondary"
                           : "destructive"
                       }
                     >
-                      {student.account_status}
+                      {student.account_status === 1 ? "Active" : "Inactive"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">

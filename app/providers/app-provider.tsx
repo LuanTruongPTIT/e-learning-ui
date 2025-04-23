@@ -1,4 +1,7 @@
+"use client";
+
 import { AuthProvider } from "@/context/auth-context";
+import { ThemeProvider } from "@/context/theme-context";
 import React from "react";
 
 //-------------------------------------------------------------------------------------------
@@ -8,5 +11,9 @@ interface AppProvidersProps {
 }
 
 export default function AppProviders({ children }: AppProvidersProps) {
-  return <AuthProvider>{children}</AuthProvider>;
+  return (
+    <ThemeProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </ThemeProvider>
+  );
 }

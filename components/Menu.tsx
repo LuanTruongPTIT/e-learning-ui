@@ -144,7 +144,7 @@ const Menu = ({ role }: MenuProps) => {
                     onClick={
                       item.href === "/logout" ? () => signOut() : undefined
                     }
-                    className="flex gap-4 items-center justify-center lg:justify-start text-gray-500 py-2 md:px-2 rounded-md hover:bg-gray-100"
+                    className="flex gap-4 items-center justify-center lg:justify-start text-gray-500 dark:text-gray-300 py-2 md:px-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     <Image src={item.icon} alt="" width={20} height={20} />
                     <span className="hidden lg:block">{item.label}</span>
