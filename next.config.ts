@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
       { hostname: "images.pexels.com" },
       { hostname: "uploadthing.com" },
       { hostname: "utfs.io" },
+      { hostname: "usth.edu.vn" },
     ],
   },
 };
