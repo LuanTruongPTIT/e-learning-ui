@@ -35,25 +35,25 @@ export function middleware(request: NextRequest) {
   }
 
   // Protected routes - require authentication
-  if (!token) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
-  }
+  // if (!token) {
+  //   return NextResponse.redirect(new URL("/sign-in", request.url));
+  // }
 
-  // // Role-based route protection
-  if (path.startsWith("/admin") && role !== "Administrator") {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
-  }
-  if (path.startsWith("/list/teachers") && role !== "Administrator") {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
-  }
+  // // // Role-based route protection
+  // if (path.startsWith("/admin") && role !== "Administrator") {
+  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
+  // }
+  // if (path.startsWith("/list/teachers") && role !== "Administrator") {
+  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
+  // }
 
-  if (path.startsWith("/teacher") && role !== "Teacher") {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
-  }
+  // if (path.startsWith("/teacher") && role !== "Teacher") {
+  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
+  // }
 
-  if (path.startsWith("/student") && role !== "Student") {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
-  }
+  // if (path.startsWith("/student") && role !== "Student") {
+  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
+  // }
   console.log(role);
   console.log(path);
   if (

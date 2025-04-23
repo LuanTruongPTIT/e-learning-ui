@@ -51,6 +51,12 @@ const menuItems = [
         visible: ["Teacher"],
       },
       {
+        icon: "/lesson.png",
+        label: "My Courses",
+        href: "/student/courses",
+        visible: ["student"],
+      },
+      {
         icon: "/exam.png",
         label: "Exams",
         href: "/list/exams",
