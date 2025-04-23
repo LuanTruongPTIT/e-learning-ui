@@ -22,15 +22,14 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import type { Course } from "@/types/course";
 // import TeachingPlans from "@/components/instructor-dashboard/teaching-plans";
 import CourseMaterials from "./course-materials";
 import CourseStudents from "./course-students";
 import CourseInformation from "./course-information";
-import TeachingPlans from "./teaching-plans";
+import { TeachingAssignCourseResponse } from "@/apis/teacher";
 
 interface CourseDetailViewProps {
-  course: Course;
+  course: TeachingAssignCourseResponse;
   onBack: () => void;
   // onCourseUpdate: (updatedCourse: Course) => void;
 }
@@ -55,39 +54,39 @@ CourseDetailViewProps) {
     }
   };
 
-  const handleMaterialsUpdate = (materials: any[]) => {
-    onCourseUpdate({
-      ...course,
-      materials,
-      materialsCount: materials.length,
-      lastUpdated: new Date(),
-    });
-  };
+  // const handleMaterialsUpdate = (materials: any[]) => {
+  //   onCourseUpdate({
+  //     ...course,
+  //     materials,
+  //     materialsCount: materials.length,
+  //     lastUpdated: new Date(),
+  //   });
+  // };
 
-  const handleStudentsUpdate = (students: any[]) => {
-    onCourseUpdate({
-      ...course,
-      students,
-      studentsCount: students.length,
-      lastUpdatced: new Date(),
-    });
-  };
+  // const handleStudentsUpdate = (students: any[]) => {
+  //   onCourseUpdate({
+  //     ...course,
+  //     students,
+  //     studentsCount: students.length,
+  //     lastUpdatced: new Date(),
+  //   });
+  // };
 
-  const handleTeachingPlansUpdate = (teachingPlans: any[]) => {
-    onCourseUpdate({
-      ...course,
-      teachingPlans,
-      lastUpdated: new Date(),
-    });
-  };
+  // const handleTeachingPlansUpdate = (teachingPlans: any[]) => {
+  //   onCourseUpdate({
+  //     ...course,
+  //     teachingPlans,
+  //     lastUpdated: new Date(),
+  //   });
+  // };
 
-  const handleCourseInfoUpdate = (data: Partial<Course>) => {
-    onCourseUpdate({
-      ...course,
-      ...data,
-      lastUpdated: new Date(),
-    });
-  };
+  // const handleCourseInfoUpdate = (data: Partial<Course>) => {
+  //   onCourseUpdate({
+  //     ...course,
+  //     ...data,
+  //     lastUpdated: new Date(),
+  //   });
+  // };
 
   return (
     <div className="space-y-6">
@@ -95,7 +94,7 @@ CourseDetailViewProps) {
         <Button variant="ghost" onClick={onBack} className="mr-2 p-2">
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-2xl font-bold">{course.title}</h1>
+        <h1 className="text-2xl font-bold">{course.course_class_name}</h1>
         <Badge
           variant="outline"
           className={`ml-3 capitalize ${getStatusBadgeVariant(course.status)}`}
@@ -113,12 +112,12 @@ CourseDetailViewProps) {
         <div className="w-full md:w-2/3">
           <p className="text-muted-foreground">{course.description}</p>
           <div className="mt-2 text-sm">
-            <span className="font-medium text-gray-700">Department:</span>{" "}
-            {course.department}
+            <span className="font-medium text-gray-700">Class:</span>{" "}
+            {course.class_name}
           </div>
           <div className="mt-1 text-sm">
             <span className="font-medium text-gray-700">Assigned by:</span>{" "}
-            {course.assignedBy} on {format(course.assignedDate, "MMM d, yyyy")}
+            {/* {course.assignedBy} on {format(course.createdAt, "MMM d, yyyy")} */}
           </div>
         </div>
         <div className="w-full md:w-1/3 flex flex-col sm:flex-row md:flex-col gap-4">
@@ -127,8 +126,8 @@ CourseDetailViewProps) {
             <div>
               <p className="text-xs text-muted-foreground">Course Duration</p>
               <p className="font-medium">
-                {format(course.startDate, "MMM d")} -{" "}
-                {format(course.endDate, "MMM d, yyyy")}
+                {format(course.start_date, "MMM d")} -{" "}
+                {format(course.end_date, "MMM d, yyyy")}
               </p>
             </div>
           </div>
@@ -136,7 +135,7 @@ CourseDetailViewProps) {
             <Users className="h-5 w-5 text-primary mr-3" />
             <div>
               <p className="text-xs text-muted-foreground">Enrolled Students</p>
-              <p className="font-medium">{course.studentsCount} students</p>
+              <p className="font-medium">0 students</p>
             </div>
           </div>
         </div>
@@ -190,33 +189,14 @@ CourseDetailViewProps) {
             <CardContent className="pt-6">
               <CourseMaterials
                 courseId={course.id}
-                materials={course.materials}
-                onMaterialsChange={handleMaterialsUpdate}
+                // materials={course.lectures}
+                // onMaterialsChange={handleMaterialsUpdate}
               />
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="teaching-plans" className="space-y-4">
-          <Card className="border-none shadow-sm">
-            <CardHeader className="bg-secondary/50 rounded-t-lg">
-              <CardTitle>Teaching Plans</CardTitle>
-              <CardDescription>
-                Create and manage lecture plans and teaching programs for this
-                course.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <TeachingPlans
-                courseId={course.id}
-                teachingPlans={course.teachingPlans}
-                onTeachingPlansChange={handleTeachingPlansUpdate}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="students" className="space-y-4">
+        {/* <TabsContent value="students" className="space-y-4">
           <Card className="border-none shadow-sm">
             <CardHeader className="bg-secondary/50 rounded-t-lg">
               <CardTitle>Student Management</CardTitle>
@@ -232,7 +212,7 @@ CourseDetailViewProps) {
               />
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
 
         <TabsContent value="information" className="space-y-4">
           <Card className="border-none shadow-sm">
@@ -245,7 +225,7 @@ CourseDetailViewProps) {
             <CardContent className="pt-6">
               <CourseInformation
                 course={course}
-                onUpdate={handleCourseInfoUpdate}
+                // onUpdate={handleCourseInfoUpdate}
               />
             </CardContent>
           </Card>

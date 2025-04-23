@@ -83,4 +83,24 @@ export const endpoints = {
     get_classes: `room/classes`,
     get_classes_by_department_of_teacher: `room/classes-by-department-of-teacher`,
   },
+  lectures: {
+    get_lectures: (teachingAssignCourseId: string) =>
+      `program/teaching-assign-courses/${teachingAssignCourseId}/lectures`,
+    create_lecture: (teachingAssignCourseId: string) =>
+      `program/teaching-assign-courses/${teachingAssignCourseId}/lectures`,
+    update_publish_status: (lectureId: string) =>
+      `program/lectures/${lectureId}/publish-status`,
+    delete_lecture: (lectureId: string) => `program/lectures/${lectureId}`,
+  },
+  students: {
+    get_students: `users/students`,
+    get_student: (studentId: string) => `users/students/${studentId}`,
+    create_student: `users/students`,
+    update_student: (studentId: string) => `users/students/${studentId}`,
+    delete_student: (studentId: string) => `users/students/${studentId}`,
+  },
+  programs: {
+    get_programs: `program/programs`,
+    get_program: (programId: string) => `program/programs/${programId}`,
+  },
 };

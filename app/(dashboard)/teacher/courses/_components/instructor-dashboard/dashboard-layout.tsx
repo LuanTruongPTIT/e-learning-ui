@@ -25,7 +25,7 @@ const mockAssignedCourses: Course[] = [
     status: "active",
     createdAt: new Date("2025-01-15"),
     lastUpdated: new Date("2025-04-20"),
-    materials: [],
+    lectures: [],
     students: [],
     teachingPlans: [],
     department: "Computer Science",
@@ -45,7 +45,7 @@ const mockAssignedCourses: Course[] = [
     status: "active",
     createdAt: new Date("2025-02-10"),
     lastUpdated: new Date("2025-04-25"),
-    materials: [],
+    lectures: [],
     students: [],
     teachingPlans: [],
     department: "Computer Science",
@@ -66,7 +66,7 @@ const mockAssignedCourses: Course[] = [
     status: "upcoming",
     createdAt: new Date("2025-03-05"),
     lastUpdated: new Date("2025-04-15"),
-    materials: [],
+    lectures: [],
     students: [],
     teachingPlans: [],
     department: "Computer Science",
@@ -86,7 +86,7 @@ const mockAssignedCourses: Course[] = [
     status: "active",
     createdAt: new Date("2025-03-20"),
     lastUpdated: new Date("2025-04-10"),
-    materials: [],
+    lectures: [],
     students: [],
     teachingPlans: [],
     department: "Software Engineering",
@@ -107,7 +107,7 @@ const mockAssignedCourses: Course[] = [
     status: "upcoming",
     createdAt: new Date("2025-04-01"),
     lastUpdated: new Date("2025-04-22"),
-    materials: [],
+    lectures: [],
     students: [],
     teachingPlans: [],
     department: "Information Systems",
@@ -119,7 +119,8 @@ const mockAssignedCourses: Course[] = [
 
 export default function DashboardLayout() {
   const [courses, setCourses] = useState<TeachingAssignCourseResponse[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [selectedCourse, setSelectedCourse] =
+    useState<TeachingAssignCourseResponse | null>(null);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -134,7 +135,7 @@ export default function DashboardLayout() {
     fetchCourses();
   }, []);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const handleCourseSelect = (course: Course) => {
+  const handleCourseSelect = (course: TeachingAssignCourseResponse) => {
     setSelectedCourse(course);
   };
 

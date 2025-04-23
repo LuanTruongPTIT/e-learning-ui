@@ -1,11 +1,16 @@
-export interface Material {
+export interface Lecture {
   id: string;
+  course_id: string;
   title: string;
-  type: string;
-  uploadDate: Date;
-  size: string;
-  fileType: string;
-  url: string;
+  description?: string;
+  content_type: "VIDEO_UPLOAD" | "YOUTUBE_LINK"; // Type of content
+  content_url: string; // URL đến file video hoặc YouTube link
+  youtube_video_id?: string; // ID của video YouTube (nếu là YouTube link)
+  duration?: number; // Thời lượng video (tính bằng giây)
+  is_published: boolean;
+  created_at: Date;
+  updated_at: Date;
+  created_by: string;
 }
 
 export interface Student {
@@ -42,7 +47,7 @@ export interface Course {
   status: string;
   createdAt: Date;
   lastUpdated: Date;
-  materials: Material[];
+  lectures: Lecture[];
   students: Student[];
   teachingPlans: TeachingPlan[];
   department: string;

@@ -223,6 +223,7 @@ export interface TeachingAssignCourseResponse {
   thumbnail_url: string;
   status: string;
   created_at: Date;
+  lectures: any[];
 }
 
 export const getTeachingAssignCourses = async (): Promise<
