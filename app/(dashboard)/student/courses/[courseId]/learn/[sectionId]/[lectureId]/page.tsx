@@ -172,9 +172,9 @@ export default function LecturePage() {
   const params = useParams();
   const { courseId, sectionId, lectureId } = params;
 
-  const [course, setCourse] = useState<any>(null);
-  const [currentSection, setCurrentSection] = useState<any>(null);
-  const [currentLecture, setCurrentLecture] = useState<any>(null);
+  const [course, setCourse] = useState<any>(mockCourseContent);
+  const [currentSection, setCurrentSection] = useState<any>(mockCourseContent.sections[0]);
+  const [currentLecture, setCurrentLecture] = useState<any>(mockCourseContent.sections[0].lectures[0]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
@@ -265,6 +265,7 @@ export default function LecturePage() {
   // Navigate to next or previous lecture
   const navigateToLecture = (direction) => {
     if (direction === "prev" && prev) {
+      //http://localhost:3000/student/courses/course-1/learn/section-2/lecture-2-3
       router.push(
         `/student/courses/${courseId}/learn/${prev.sectionId}/${prev.lectureId}`
       );
@@ -362,7 +363,7 @@ export default function LecturePage() {
                 defaultValue={[currentSection.id]}
                 className="w-full"
               >
-                {course.sections.map((section, index) => (
+                {mockCourseContent.sections.map((section, index) => (
                   <AccordionItem key={section.id} value={section.id}>
                     <AccordionTrigger className="px-4 py-2 hover:bg-muted/50">
                       <div className="flex flex-col items-start text-left">

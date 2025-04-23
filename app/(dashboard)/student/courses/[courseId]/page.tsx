@@ -266,28 +266,28 @@ export default function CourseDetailsPage() {
   const params = useParams();
   const courseId = params.courseId;
 
-  const [course, setCourse] = useState<CourseDetails | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [course, setCourse] = useState<CourseDetails | null>(mockCourseDetails);
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("content");
 
-  useEffect(() => {
-    // Simulate API call to fetch course details
-    const fetchCourseDetails = async () => {
-      try {
-        // Fetch course details from API
-        const response = await getCourseDetails(courseId as string);
-        setCourse(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching course details:", error);
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   // Simulate API call to fetch course details
+  //   const fetchCourseDetails = async () => {
+  //     try {
+  //       // Fetch course details from API
+  //       const response = await getCourseDetails(courseId as string);
+  //       setCourse(response.data);
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.error("Error fetching course details:", error);
+  //       setLoading(false);
+  //     }
+  //   };
 
-    if (courseId) {
-      fetchCourseDetails();
-    }
-  }, [courseId]);
+  //   if (courseId) {
+  //     fetchCourseDetails();
+  //   }
+  // }, [courseId]);
 
   // Format date to readable format
   const formatDate = (dateString) => {

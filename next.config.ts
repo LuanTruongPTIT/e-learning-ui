@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       { hostname: "utfs.io" },
       { hostname: "usth.edu.vn" },
       { hostname: "images.unsplash.com" },
+      {hostname: "randomuser.me"}
     ],
   },
 };
