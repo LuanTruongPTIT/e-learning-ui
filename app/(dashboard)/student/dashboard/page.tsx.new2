@@ -1,0 +1,258 @@
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[80vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="container mx-auto py-6">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Student Dashboard</h1>
+        <Link href="/student/courses">
+          <Button>View All Courses</Button>
+        </Link>
+      </div>
+
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="progress">Learning Progress</TabsTrigger>
+          <TabsTrigger value="activity">Recent Activity</TabsTrigger>
+          <TabsTrigger value="deadlines">Upcoming Deadlines</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-4">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
+                <BookOpen className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{totalCourses}</div>
+                <p className="text-xs text-muted-foreground">
+                  Enrolled courses
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">In Progress</CardTitle>
+                <Clock className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{inProgressCourses}</div>
+                <p className="text-xs text-muted-foreground">
+                  Courses in progress
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Completed</CardTitle>
+                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{completedCourses}</div>
+                <p className="text-xs text-muted-foreground">
+                  Completed courses
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Overall Progress</CardTitle>
+                <Activity className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{overallProgress}%</div>
+                <Progress value={overallProgress} className="h-2 mt-2" />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Charts and Recent Courses */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle>Learning Progress</CardTitle>
+                <CardDescription>Your course completion progress over time</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CourseProgressChart data={progressData} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Subject Distribution</CardTitle>
+                <CardDescription>Courses by subject area</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SubjectDistributionChart data={subjectDistribution} />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Recent Courses and Upcoming Deadlines */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Courses</CardTitle>
+                <CardDescription>Continue where you left off</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {recentCourses.map((course) => (
+                    <RecentCourseCard key={course.id} course={course} />
+                  ))}
+                  {recentCourses.length === 0 && (
+                    <div className="text-center py-4 text-muted-foreground">
+                      No recent courses
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Upcoming Deadlines</CardTitle>
+                <CardDescription>Don&apos;t miss these deadlines</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {upcomingDeadlines.map((deadline) => (
+                    <UpcomingDeadlineCard
+                      key={deadline.id}
+                      deadline={deadline}
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="progress" className="space-y-4">
+          {/* Learning Progress Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Course Progress</CardTitle>
+                <CardDescription>
+                  Your progress across all courses
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-80">
+                <CourseProgressChart data={progressData} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Weekly Study Time</CardTitle>
+                <CardDescription>Hours spent studying per day</CardDescription>
+              </CardHeader>
+              <CardContent className="h-80">
+                <WeeklyStudyChart data={weeklyStudyData} />
+              </CardContent>
+            </Card>
+          </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Course Completion Status</CardTitle>
+              <CardDescription>
+                Progress for each enrolled course
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {dashboardData?.recentCourses
+                  ? dashboardData.recentCourses.map((course) => (
+                      <div key={course.id} className="space-y-1">
+                        <div className="flex justify-between">
+                          <span className="font-medium">{course.title}</span>
+                          <span>{course.progress}%</span>
+                        </div>
+                        <Progress value={course.progress} className="h-2" />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>
+                            {course.completedLectures ||
+                              course.completed_lectures}{" "}
+                            of {course.totalLectures || course.total_lectures}{" "}
+                            lectures completed
+                          </span>
+                          <span>{course.category}</span>
+                        </div>
+                      </div>
+                    ))
+                  : mockEnrolledCourses.map((course) => (
+                      <div key={course.id} className="space-y-1">
+                        <div className="flex justify-between">
+                          <span className="font-medium">{course.title}</span>
+                          <span>{course.progress}%</span>
+                        </div>
+                        <Progress value={course.progress} className="h-2" />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>
+                            {course.completed_lectures} of{" "}
+                            {course.total_lectures} lectures completed
+                          </span>
+                          <span>{course.category}</span>
+                        </div>
+                      </div>
+                    ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="activity" className="space-y-4">
+          {/* Recent Activity Content */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Learning Activity Timeline</CardTitle>
+              <CardDescription>Your recent learning activities</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LearningActivityTimeline activities={recentActivities} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="deadlines" className="space-y-4">
+          {/* Upcoming Deadlines Content */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Upcoming Deadlines</CardTitle>
+              <CardDescription>
+                Assignments, quizzes, and projects due soon
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {upcomingDeadlines.map((deadline) => (
+                  <UpcomingDeadlineCard key={deadline.id} deadline={deadline} />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

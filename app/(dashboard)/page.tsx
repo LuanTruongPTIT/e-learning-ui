@@ -3,7 +3,13 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
@@ -12,12 +18,14 @@ export default function DashboardPage() {
   useEffect(() => {
     // Get user role from cookies
     const role = Cookies.get("role");
-    
+
     // Redirect based on role
     if (role === "Administrator") {
       router.push("/admin");
     } else if (role === "Teacher" || role === "Lecturer") {
       router.push("/teacher");
+    } else if (role === "Student") {
+      router.push("/student/dashboard");
     }
   }, [router]);
 
@@ -26,13 +34,11 @@ export default function DashboardPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Welcome to E-Learning Dashboard</CardTitle>
-          <CardDescription>
-            Please select your role to continue
-          </CardDescription>
+          <CardDescription>Please select your role to continue</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button 
-            className="w-full" 
+          <Button
+            className="w-full"
             size="lg"
             onClick={() => {
               Cookies.set("role", "Administrator");
@@ -41,8 +47,8 @@ export default function DashboardPage() {
           >
             Continue as Administrator
           </Button>
-          <Button 
-            className="w-full" 
+          <Button
+            className="w-full"
             size="lg"
             variant="outline"
             onClick={() => {
@@ -51,6 +57,17 @@ export default function DashboardPage() {
             }}
           >
             Continue as Teacher
+          </Button>
+          <Button
+            className="w-full"
+            size="lg"
+            variant="secondary"
+            onClick={() => {
+              Cookies.set("role", "Student");
+              router.push("/student/dashboard");
+            }}
+          >
+            Continue as Student
           </Button>
         </CardContent>
       </Card>

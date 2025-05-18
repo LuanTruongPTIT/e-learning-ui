@@ -82,47 +82,67 @@ export interface EnrolledCourse {
   thumbnail: string;
   instructor: string;
   progress: number;
-  total_lectures: number;
-  completed_lectures: number;
-  last_accessed: string | null;
+  totalLectures?: number;
+  total_lectures?: number;
+  completedLectures?: number;
+  completed_lectures?: number;
+  lastAccessed?: string | null;
+  last_accessed?: string | null;
   category: string;
   status: string;
 }
 
-export const getEnrolledCourses = async (): Promise<IApiResponse<EnrolledCourse[]>> => {
+export const getEnrolledCourses = async (): Promise<
+  IApiResponse<EnrolledCourse[]>
+> => {
   try {
-    const result = await axiosInstance.get(endpoints.student.get_enrolled_courses, {
-      withCredentials: true,
-    });
+    const result = await axiosInstance.get(
+      endpoints.student.get_enrolled_courses,
+      {
+        withCredentials: true,
+      }
+    );
     return result.data;
   } catch (error) {
     throw error;
   }
 };
 
-export const getCourseDetails = async (courseId: string): Promise<IApiResponse<CourseDetails>> => {
+export const getCourseDetails = async (
+  courseId: string
+): Promise<IApiResponse<CourseDetails>> => {
   try {
-    const result = await axiosInstance.get(endpoints.student.get_course_details(courseId), {
-      withCredentials: true,
-    });
+    const result = await axiosInstance.get(
+      endpoints.student.get_course_details(courseId),
+      {
+        withCredentials: true,
+      }
+    );
     return result.data;
   } catch (error) {
     throw error;
   }
 };
 
-export const getCourseContent = async (courseId: string): Promise<IApiResponse<CourseDetails>> => {
+export const getCourseContent = async (
+  courseId: string
+): Promise<IApiResponse<CourseDetails>> => {
   try {
-    const result = await axiosInstance.get(endpoints.student.get_course_content(courseId), {
-      withCredentials: true,
-    });
+    const result = await axiosInstance.get(
+      endpoints.student.get_course_content(courseId),
+      {
+        withCredentials: true,
+      }
+    );
     return result.data;
   } catch (error) {
     throw error;
   }
 };
 
-export const markLectureAsCompleted = async (lectureId: string): Promise<IApiResponse<{ success: boolean }>> => {
+export const markLectureAsCompleted = async (
+  lectureId: string
+): Promise<IApiResponse<{ success: boolean }>> => {
   try {
     const result = await axiosInstance.post(
       endpoints.student.mark_lecture_completed(lectureId),

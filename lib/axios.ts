@@ -110,6 +110,15 @@ export const endpoints = {
       `student/courses/${courseId}/content`,
     mark_lecture_completed: (lectureId: string) =>
       `student/lectures/${lectureId}/complete`,
+    // Dashboard endpoints
+    get_dashboard_data: `student/dashboard`,
+    get_dashboard_stats: `student/dashboard/stats`,
+    get_recent_courses: `student/dashboard/recent-courses`,
+    get_upcoming_deadlines: `student/dashboard/deadlines`,
+    get_recent_activities: `student/dashboard/activities`,
+    get_progress_data: `student/dashboard/progress`,
+    get_weekly_study_data: `student/dashboard/weekly-study`,
+    get_subject_distribution: `student/dashboard/subjects`,
   },
   profile: {
     get_current_user: `users/me`,

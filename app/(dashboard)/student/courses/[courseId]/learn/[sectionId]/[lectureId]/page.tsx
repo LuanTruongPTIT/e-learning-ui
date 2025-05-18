@@ -173,8 +173,12 @@ export default function LecturePage() {
   const { courseId, sectionId, lectureId } = params;
 
   const [course, setCourse] = useState<any>(mockCourseContent);
-  const [currentSection, setCurrentSection] = useState<any>(mockCourseContent.sections[0]);
-  const [currentLecture, setCurrentLecture] = useState<any>(mockCourseContent.sections[0].lectures[0]);
+  const [currentSection, setCurrentSection] = useState<any>(
+    mockCourseContent.sections[0]
+  );
+  const [currentLecture, setCurrentLecture] = useState<any>(
+    mockCourseContent.sections[0].lectures[0]
+  );
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
