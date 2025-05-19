@@ -9,97 +9,97 @@ import CourseCard from "@/components/CourseCard";
 import { getEnrolledCourses, EnrolledCourse } from "@/apis/student-courses";
 
 // Mock data for enrolled courses
-const mockEnrolledCourses = [
-  {
-    id: "course-1",
-    title: "Introduction to Web Development",
-    description:
-      "Learn the basics of HTML, CSS, and JavaScript to build modern websites.",
-    thumbnail:
-      "https://images.unsplash.com/photo-1593720213428-28a5b9e94613?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    instructor: "John Doe",
-    progress: 65,
-    total_lectures: 24,
-    completed_lectures: 16,
-    last_accessed: "2023-06-15T10:30:00Z",
-    category: "Web Development",
-    status: "in_progress",
-  },
-  {
-    id: "course-2",
-    title: "Advanced JavaScript Programming",
-    description:
-      "Master JavaScript with advanced concepts like closures, promises, and async/await.",
-    thumbnail:
-      "https://images.unsplash.com/photo-1627398242454-45a1465c2479?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    instructor: "Jane Smith",
-    progress: 30,
-    total_lectures: 32,
-    completed_lectures: 10,
-    last_accessed: "2023-06-18T14:45:00Z",
-    category: "Programming",
-    status: "in_progress",
-  },
-  {
-    id: "course-3",
-    title: "Database Design and SQL",
-    description:
-      "Learn how to design efficient databases and write complex SQL queries.",
-    thumbnail:
-      "https://images.unsplash.com/photo-1489875347897-49f64b51c1f8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    instructor: "Robert Johnson",
-    progress: 100,
-    total_lectures: 18,
-    completed_lectures: 18,
-    last_accessed: "2023-06-10T09:15:00Z",
-    category: "Database",
-    status: "completed",
-  },
-  {
-    id: "course-4",
-    title: "Mobile App Development with React Native",
-    description: "Build cross-platform mobile applications using React Native.",
-    thumbnail:
-      "https://images.unsplash.com/photo-1551650975-87deedd944c3?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    instructor: "Sarah Williams",
-    progress: 10,
-    total_lectures: 30,
-    completed_lectures: 3,
-    last_accessed: "2023-06-20T16:20:00Z",
-    category: "Mobile Development",
-    status: "in_progress",
-  },
-  {
-    id: "course-5",
-    title: "Data Structures and Algorithms",
-    description:
-      "Master the fundamental data structures and algorithms used in software development.",
-    thumbnail:
-      "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    instructor: "Michael Brown",
-    progress: 45,
-    total_lectures: 40,
-    completed_lectures: 18,
-    last_accessed: "2023-06-17T11:10:00Z",
-    category: "Computer Science",
-    status: "in_progress",
-  },
-  {
-    id: "course-6",
-    title: "Introduction to Artificial Intelligence",
-    description:
-      "Learn the basics of AI, machine learning, and neural networks.",
-    thumbnail:
-      "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2065&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    instructor: "Emily Davis",
-    progress: 0,
-    total_lectures: 28,
-    completed_lectures: 0,
-    last_accessed: null,
-    category: "Artificial Intelligence",
-    status: "not_started",
-  },
-];
+// const mockEnrolledCourses = [
+//   {
+//     id: "course-1",
+//     title: "Introduction to Web Development",
+//     description:
+//       "Learn the basics of HTML, CSS, and JavaScript to build modern websites.",
+//     thumbnail:
+//       "https://images.unsplash.com/photo-1593720213428-28a5b9e94613?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     instructor: "John Doe",
+//     progress: 65,
+//     total_lectures: 24,
+//     completed_lectures: 16,
+//     last_accessed: "2023-06-15T10:30:00Z",
+//     category: "Web Development",
+//     status: "in_progress",
+//   },
+//   {
+//     id: "course-2",
+//     title: "Advanced JavaScript Programming",
+//     description:
+//       "Master JavaScript with advanced concepts like closures, promises, and async/await.",
+//     thumbnail:
+//       "https://images.unsplash.com/photo-1627398242454-45a1465c2479?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     instructor: "Jane Smith",
+//     progress: 30,
+//     total_lectures: 32,
+//     completed_lectures: 10,
+//     last_accessed: "2023-06-18T14:45:00Z",
+//     category: "Programming",
+//     status: "in_progress",
+//   },
+//   {
+//     id: "course-3",
+//     title: "Database Design and SQL",
+//     description:
+//       "Learn how to design efficient databases and write complex SQL queries.",
+//     thumbnail:
+//       "https://images.unsplash.com/photo-1489875347897-49f64b51c1f8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     instructor: "Robert Johnson",
+//     progress: 100,
+//     total_lectures: 18,
+//     completed_lectures: 18,
+//     last_accessed: "2023-06-10T09:15:00Z",
+//     category: "Database",
+//     status: "completed",
+//   },
+//   {
+//     id: "course-4",
+//     title: "Mobile App Development with React Native",
+//     description: "Build cross-platform mobile applications using React Native.",
+//     thumbnail:
+//       "https://images.unsplash.com/photo-1551650975-87deedd944c3?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     instructor: "Sarah Williams",
+//     progress: 10,
+//     total_lectures: 30,
+//     completed_lectures: 3,
+//     last_accessed: "2023-06-20T16:20:00Z",
+//     category: "Mobile Development",
+//     status: "in_progress",
+//   },
+//   {
+//     id: "course-5",
+//     title: "Data Structures and Algorithms",
+//     description:
+//       "Master the fundamental data structures and algorithms used in software development.",
+//     thumbnail:
+//       "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     instructor: "Michael Brown",
+//     progress: 45,
+//     total_lectures: 40,
+//     completed_lectures: 18,
+//     last_accessed: "2023-06-17T11:10:00Z",
+//     category: "Computer Science",
+//     status: "in_progress",
+//   },
+//   {
+//     id: "course-6",
+//     title: "Introduction to Artificial Intelligence",
+//     description:
+//       "Learn the basics of AI, machine learning, and neural networks.",
+//     thumbnail:
+//       "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2065&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     instructor: "Emily Davis",
+//     progress: 0,
+//     total_lectures: 28,
+//     completed_lectures: 0,
+//     last_accessed: null,
+//     category: "Artificial Intelligence",
+//     status: "not_started",
+//   },
+// ];
 
 export default function StudentCoursesPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -125,12 +125,12 @@ export default function StudentCoursesPage() {
   }, []);
 
   // Filter courses based on search query and active tab
-  const filteredCourses = mockEnrolledCourses.filter((course) => {
+  const filteredCourses = enrolledCourses.filter((course) => {
     const matchesSearch =
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      course.course_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.instructor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.category.toLowerCase().includes(searchQuery.toLowerCase());
+      course.teacher_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      course.course_code.toLowerCase().includes(searchQuery.toLowerCase());
 
     if (activeTab === "all") return matchesSearch;
     if (activeTab === "in_progress")
@@ -194,17 +194,16 @@ export default function StudentCoursesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map((course) => (
             <CourseCard
-              key={course.id}
-              id={course.id}
-              title={course.title}
+              key={course.course_id}
+              id={course.course_id}
+              title={course.course_name}
               description={course.description}
-              thumbnail={course.thumbnail}
-              instructor={course.instructor}
-              progress={course.progress}
+              thumbnail={course.thumbnail_url}
+              instructor={course.teacher_name}
+              progress={course.progress_percentage}
               totalLectures={course.total_lectures}
               completedLectures={course.completed_lectures}
-              lastAccessed={course.last_accessed}
-              category={course.category}
+              lastAccessed={course?.last_accessed}
               status={
                 course.status as "completed" | "in_progress" | "not_started"
               }

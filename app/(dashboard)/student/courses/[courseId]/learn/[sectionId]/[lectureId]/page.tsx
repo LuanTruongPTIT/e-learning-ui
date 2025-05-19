@@ -439,7 +439,8 @@ export default function LecturePage() {
           {/* Video Player */}
           <div className="h-[60vh] bg-black">
             <VideoPlayer
-              src={currentLecture.video_url}
+              // src={currentLecture.video_url}
+              src="https://www.youtube.com/watch?v=kmy_YNhl0mw&t=10796s"
               title={currentLecture.title}
               onComplete={handleLectureComplete}
               autoMarkComplete={true}

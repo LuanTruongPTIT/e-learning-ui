@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -17,8 +23,7 @@ interface CourseCardProps {
   progress: number;
   totalLectures: number;
   completedLectures: number;
-  lastAccessed: string | null;
-  category: string;
+  lastAccessed?: string | null;
   status: "completed" | "in_progress" | "not_started";
 }
 
@@ -32,8 +37,7 @@ export default function CourseCard({
   totalLectures,
   completedLectures,
   lastAccessed,
-  category,
-  status
+  status,
 }: CourseCardProps) {
   // Format date to readable format
   const formatDate = (dateString: string | null) => {
@@ -42,26 +46,29 @@ export default function CourseCard({
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
-      day: "numeric"
+      day: "numeric",
     });
   };
 
   return (
     <Card className="overflow-hidden flex flex-col h-full">
       <div className="relative h-48 w-full">
-        <Image
-          src={thumbnail}
-          alt={title}
-          fill
-          className="object-cover"
-        />
+        <Image src={thumbnail} alt={title} fill className="object-cover" />
         <div className="absolute top-2 right-2">
-          <Badge variant={
-            status === "completed" ? "success" :
-            status === "in_progress" ? "info" : "secondary"
-          }>
-            {status === "completed" ? "Completed" :
-             status === "in_progress" ? "In Progress" : "Not Started"}
+          <Badge
+            variant={
+              status === "completed"
+                ? "success"
+                : status === "in_progress"
+                ? "info"
+                : "secondary"
+            }
+          >
+            {status === "completed"
+              ? "Completed"
+              : status === "in_progress"
+              ? "In Progress"
+              : "Not Started"}
           </Badge>
         </div>
       </div>
@@ -86,7 +93,9 @@ export default function CourseCard({
           <div className="flex justify-between text-sm">
             <div className="flex items-center gap-1">
               <BookOpen className="h-4 w-4 text-muted-foreground" />
-              <span>{completedLectures}/{totalLectures} lectures</span>
+              <span>
+                {completedLectures}/{totalLectures} lectures
+              </span>
             </div>
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4 text-muted-foreground" />

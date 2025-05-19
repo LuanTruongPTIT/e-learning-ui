@@ -614,36 +614,6 @@ export default function CourseDetailsPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Course Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="font-medium mb-1">Category</h3>
-                <p className="text-sm text-muted-foreground">
-                  {course.category}
-                </p>
-              </div>
-              <div>
-                <h3 className="font-medium mb-1">Level</h3>
-                <p className="text-sm text-muted-foreground">{course.level}</p>
-              </div>
-              <div>
-                <h3 className="font-medium mb-1">Total Duration</h3>
-                <p className="text-sm text-muted-foreground">
-                  {course.total_duration}
-                </p>
-              </div>
-              <div>
-                <h3 className="font-medium mb-1">Last Updated</h3>
-                <p className="text-sm text-muted-foreground">
-                  {formatDate(course.updated_at)}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
               <CardTitle>Instructor</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">

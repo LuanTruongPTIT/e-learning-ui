@@ -76,19 +76,16 @@ export interface CourseDetails {
 }
 
 export interface EnrolledCourse {
-  id: string;
-  title: string;
+  course_id: string;
+  course_name: string;
+  course_code: string;
   description: string;
-  thumbnail: string;
-  instructor: string;
-  progress: number;
-  totalLectures?: number;
-  total_lectures?: number;
-  completedLectures?: number;
-  completed_lectures?: number;
-  lastAccessed?: string | null;
+  thumbnail_url: string;
+  teacher_name: string;
+  progress_percentage: number;
+  total_lectures: number;
+  completed_lectures: number;
   last_accessed?: string | null;
-  category: string;
   status: string;
 }
 

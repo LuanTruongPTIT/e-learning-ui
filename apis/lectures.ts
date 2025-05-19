@@ -15,6 +15,7 @@ export interface CreateLectureRequest {
   youtube_video_id?: string;
   duration?: number;
   is_published: boolean;
+  materialType: string;
 }
 
 export const getLectures = async (

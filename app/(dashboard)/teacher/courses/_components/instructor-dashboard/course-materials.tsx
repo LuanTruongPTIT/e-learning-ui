@@ -250,6 +250,7 @@ export default function CourseMaterials({ courseId }: CourseMaterialsProps) {
         youtube_video_id: youtubeVideoId || undefined,
         duration: uploadForm.uploadType === "file" ? 0 : 0, // Placeholder, actual duration would be determined later
         is_published: uploadForm.is_published,
+        materialType: uploadForm.materialType,
       };
 
       // Call API to create lecture
