@@ -14,6 +14,10 @@ import {
   SkipForward,
   Settings,
 } from "lucide-react";
+import YouTubePlayer, {
+  extractYouTubeVideoId,
+  isYouTubeUrl,
+} from "./YouTubePlayer";
 
 interface VideoPlayerProps {
   src: string;
@@ -21,16 +25,17 @@ interface VideoPlayerProps {
   onComplete?: () => void;
   autoMarkComplete?: boolean;
   autoMarkCompleteThreshold?: number; // percentage of video watched to mark as complete
+  youtubeVideoId?: string; // YouTube video ID for YouTube videos
 }
 
-export default function VideoPlayer({
+// HTML5 Video Player Component (for non-YouTube videos)
+function HTML5VideoPlayer({
   src,
   title,
   onComplete,
   autoMarkComplete = true,
   autoMarkCompleteThreshold = 80,
-}: VideoPlayerProps) {
-  console.log("src", src);
+}: Omit<VideoPlayerProps, "youtubeVideoId">) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -106,7 +111,7 @@ export default function VideoPlayer({
         newProgress >= autoMarkCompleteThreshold
       ) {
         setHasMarkedComplete(true);
-        onComplete && onComplete();
+        onComplete?.();
       }
     };
 
@@ -118,7 +123,7 @@ export default function VideoPlayer({
       setIsPlaying(false);
       if (autoMarkComplete && !hasMarkedComplete) {
         setHasMarkedComplete(true);
-        onComplete && onComplete();
+        onComplete?.();
       }
     };
 
@@ -375,5 +380,45 @@ export default function VideoPlayer({
         </div>
       </div>
     </div>
+  );
+}
+
+// Main VideoPlayer component that decides between YouTube and HTML5 player
+export default function VideoPlayer({
+  src,
+  title,
+  onComplete,
+  autoMarkComplete = true,
+  autoMarkCompleteThreshold = 80,
+  youtubeVideoId,
+}: VideoPlayerProps) {
+  console.log("src", src);
+
+  // Determine if this is a YouTube video
+  const isYouTube = isYouTubeUrl(src) || !!youtubeVideoId;
+  const videoId = youtubeVideoId || extractYouTubeVideoId(src);
+
+  // If this is a YouTube video, render YouTube embed instead
+  if (isYouTube && videoId) {
+    return (
+      <YouTubePlayer
+        videoId={videoId}
+        title={title}
+        onComplete={onComplete}
+        autoMarkComplete={autoMarkComplete}
+        autoMarkCompleteThreshold={autoMarkCompleteThreshold}
+      />
+    );
+  }
+
+  // Otherwise, use HTML5 video player
+  return (
+    <HTML5VideoPlayer
+      src={src}
+      title={title}
+      onComplete={onComplete}
+      autoMarkComplete={autoMarkComplete}
+      autoMarkCompleteThreshold={autoMarkCompleteThreshold}
+    />
   );
 }
