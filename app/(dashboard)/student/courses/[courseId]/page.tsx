@@ -5,12 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+// Removed unused accordion imports
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -34,229 +29,122 @@ import Link from "next/link";
 import Image from "next/image";
 import { getCourseDetails, CourseDetails } from "@/apis/student-courses";
 
-// Mock data for course details
+// Mock data for course details based on actual system structure without sections
 const mockCourseDetails = {
-  id: "course-1",
-  title: "Complete Web Development Bootcamp",
+  course_id: "550e8400-e29b-41d4-a716-446655440000", // UUID format
+  course_name: "Introduction to Web Development",
   description:
-    "Learn web development from scratch. This comprehensive course covers HTML, CSS, JavaScript, React, Node.js, and more.",
-  thumbnail:
+    "Learn the fundamentals of web development including HTML, CSS, JavaScript, and modern frameworks.",
+  thumbnail_url:
     "https://images.unsplash.com/photo-1593720213428-28a5b9e94613?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   instructor: {
-    name: "John Doe",
+    teacher_name: "Nguyen Van A",
     avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    title: "Senior Web Developer",
-    bio: "John has 10+ years of experience in web development and has taught over 50,000 students online.",
   },
-  progress: 25,
-  total_lectures: 48,
-  completed_lectures: 12,
-  total_duration: "24h 30m",
+  progress_percent: 25,
+  total_lectures: 15,
+  completed_lectures: 4,
   last_accessed: "2023-06-15T10:30:00Z",
   created_at: "2023-01-10T08:00:00Z",
   updated_at: "2023-05-20T14:15:00Z",
-  category: "Web Development",
-  level: "Beginner to Advanced",
   status: "in_progress",
-  sections: [
+  lectures: [
     {
-      id: "section-1",
-      title: "Web Fundamentals",
-      description: "Learn the basics of web development",
-      progress: 100,
-      lectures: [
-        {
-          id: "lecture-1-1",
-          title: "Introduction to HTML",
-          type: "video",
-          duration: "15m",
-          is_completed: true,
-          is_preview: true,
-        },
-        {
-          id: "lecture-1-2",
-          title: "CSS Fundamentals",
-          type: "video",
-          duration: "20m",
-          is_completed: true,
-          is_preview: false,
-        },
-        {
-          id: "lecture-1-3",
-          title: "JavaScript Basics",
-          type: "video",
-          duration: "25m",
-          is_completed: true,
-          is_preview: false,
-        },
-      ],
+      id: "550e8400-e29b-41d4-a716-446655440101",
+      title: "Introduction to HTML",
+      content_type: "video",
+      is_completed: true,
+      content_url: "https://example.com/videos/intro-to-html.mp4",
+      description: "An introduction to HTML structure and basic elements",
     },
     {
-      id: "section-2",
-      title: "Responsive Design",
-      description: "Create websites that work on any device",
-      progress: 50,
-      lectures: [
-        {
-          id: "lecture-2-1",
-          title: "Responsive Design Principles",
-          type: "video",
-          duration: "18m",
-          is_completed: true,
-          is_preview: false,
-        },
-        {
-          id: "lecture-2-2",
-          title: "Media Queries",
-          type: "video",
-          duration: "22m",
-          is_completed: true,
-          is_preview: false,
-        },
-        {
-          id: "lecture-2-3",
-          title: "Flexbox Layout",
-          type: "video",
-          duration: "28m",
-          is_completed: false,
-          is_preview: false,
-        },
-        {
-          id: "lecture-2-4",
-          title: "CSS Grid Layout",
-          type: "video",
-          duration: "30m",
-          is_completed: false,
-          is_preview: false,
-        },
-      ],
+      id: "550e8400-e29b-41d4-a716-446655440102",
+      title: "HTML Elements and Attributes",
+      content_type: "video",
+      is_completed: true,
+      content_url: "https://example.com/videos/html-elements.mp4",
+      description: "Learn about different HTML elements and their attributes",
     },
     {
-      id: "section-3",
-      title: "JavaScript Deep Dive",
-      description: "Master JavaScript programming",
-      progress: 0,
-      lectures: [
-        {
-          id: "lecture-3-1",
-          title: "JavaScript Functions",
-          type: "video",
-          duration: "25m",
-          is_completed: false,
-          is_preview: false,
-        },
-        {
-          id: "lecture-3-2",
-          title: "Working with Arrays",
-          type: "video",
-          duration: "22m",
-          is_completed: false,
-          is_preview: false,
-        },
-        {
-          id: "lecture-3-3",
-          title: "DOM Manipulation",
-          type: "video",
-          duration: "35m",
-          is_completed: false,
-          is_preview: false,
-        },
-        {
-          id: "lecture-3-4",
-          title: "Event Handling",
-          type: "video",
-          duration: "28m",
-          is_completed: false,
-          is_preview: false,
-        },
-        {
-          id: "lecture-3-5",
-          title: "Asynchronous JavaScript",
-          type: "video",
-          duration: "40m",
-          is_completed: false,
-          is_preview: false,
-        },
-      ],
+      id: "550e8400-e29b-41d4-a716-446655440103",
+      title: "HTML Forms",
+      content_type: "video",
+      is_completed: true,
+      content_url: "https://example.com/videos/html-forms.mp4",
+      description: "Creating interactive forms with HTML",
     },
     {
-      id: "section-4",
-      title: "Building Projects",
-      description: "Apply your knowledge to real projects",
-      progress: 0,
-      lectures: [
-        {
-          id: "lecture-4-1",
-          title: "Project Setup",
-          type: "video",
-          duration: "15m",
-          is_completed: false,
-          is_preview: false,
-        },
-        {
-          id: "lecture-4-2",
-          title: "Building a Landing Page",
-          type: "video",
-          duration: "45m",
-          is_completed: false,
-          is_preview: false,
-        },
-        {
-          id: "lecture-4-3",
-          title: "Creating a Portfolio Website",
-          type: "video",
-          duration: "50m",
-          is_completed: false,
-          is_preview: false,
-        },
-        {
-          id: "lecture-4-4",
-          title: "Building an E-commerce Site",
-          type: "video",
-          duration: "60m",
-          is_completed: false,
-          is_preview: false,
-        },
-      ],
+      id: "550e8400-e29b-41d4-a716-446655440201",
+      title: "CSS Basics",
+      content_type: "video",
+      is_completed: true,
+      content_url: "https://example.com/videos/css-basics.mp4",
+      description: "Introduction to CSS selectors and properties",
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440202",
+      title: "CSS Box Model",
+      content_type: "video",
+      is_completed: false,
+      content_url: "https://example.com/videos/css-box-model.mp4",
+      description: "Understanding the CSS box model",
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440203",
+      title: "Flexbox Layout",
+      content_type: "video",
+      is_completed: false,
+      content_url: "https://example.com/videos/flexbox.mp4",
+      description: "Creating flexible layouts with CSS Flexbox",
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440204",
+      title: "CSS Grid Layout",
+      content_type: "video",
+      is_completed: false,
+      content_url: "https://example.com/videos/css-grid.mp4",
+      description: "Building complex layouts with CSS Grid",
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440301",
+      title: "JavaScript Syntax",
+      content_type: "video",
+      is_completed: false,
+      content_url: "https://example.com/videos/js-syntax.mp4",
+      description: "Basic JavaScript syntax and data types",
+      order_index: 8,
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440302",
+      title: "JavaScript Functions",
+      content_type: "video",
+      is_completed: false,
+      content_url: "https://example.com/videos/js-functions.mp4",
+      description: "Working with functions in JavaScript",
     },
   ],
   announcements: [
     {
       id: "announcement-1",
-      title: "Course Updated with New Content",
+      title: "New Content Added",
       content:
-        "We've added new lectures on React Hooks and Server Components. Check out Section 5!",
+        "We've added new lectures on React Hooks. Check out the latest lectures!",
       date: "2023-05-20T14:15:00Z",
     },
     {
       id: "announcement-2",
       title: "Live Q&A Session",
       content:
-        "Join us for a live Q&A session on June 30th at 3 PM EST to get your questions answered.",
+        "Join us for a live Q&A session on June 30th at 3 PM to get your questions answered.",
       date: "2023-06-10T09:00:00Z",
     },
   ],
   resources: [
     {
-      id: "resource-1",
-      title: "HTML Cheat Sheet",
-      type: "pdf",
-      size: "1.2 MB",
-      url: "#",
-    },
-    {
-      id: "resource-2",
-      title: "CSS Reference Guide",
-      type: "pdf",
-      size: "2.5 MB",
-      url: "#",
-    },
-    {
       id: "resource-3",
       title: "JavaScript Code Samples",
-      type: "zip",
-      size: "4.8 MB",
-      url: "#",
+      content_type: "zip",
+      content_url: "/resources/js-samples.zip",
     },
   ],
 };
@@ -270,27 +158,27 @@ export default function CourseDetailsPage() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("content");
 
-  // useEffect(() => {
-  //   // Simulate API call to fetch course details
-  //   const fetchCourseDetails = async () => {
-  //     try {
-  //       // Fetch course details from API
-  //       const response = await getCourseDetails(courseId as string);
-  //       setCourse(response.data);
-  //       setLoading(false);
-  //     } catch (error) {
-  //       console.error("Error fetching course details:", error);
-  //       setLoading(false);
-  //     }
-  //   };
+  useEffect(() => {
+    // Fetch course details from API
+    const fetchCourseDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await getCourseDetails(courseId as string);
+        setCourse(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+        setLoading(false);
+      }
+    };
 
-  //   if (courseId) {
-  //     fetchCourseDetails();
-  //   }
-  // }, [courseId]);
+    if (courseId) {
+      fetchCourseDetails();
+    }
+  }, [courseId]);
 
   // Format date to readable format
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string | null | undefined): string => {
     if (!dateString) return "";
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -304,15 +192,10 @@ export default function CourseDetailsPage() {
   const calculateProgress = () => {
     if (!course) return { total: 0, completed: 0, percentage: 0 };
 
-    let total = 0;
-    let completed = 0;
-
-    course.sections.forEach((section) => {
-      total += section.lectures.length;
-      section.lectures.forEach((lecture) => {
-        if (lecture.is_completed) completed++;
-      });
-    });
+    const total = course.lectures.length;
+    const completed = course.lectures.filter(
+      (lecture) => lecture.is_completed
+    ).length;
 
     return {
       total,
@@ -329,20 +212,18 @@ export default function CourseDetailsPage() {
   const findNextLecture = () => {
     if (!course) return null;
 
-    for (const section of course.sections) {
-      for (const lecture of section.lectures) {
-        if (!lecture.is_completed) {
-          return { sectionId: section.id, lectureId: lecture.id };
-        }
-      }
+    // Find the first incomplete lecture
+    const nextLecture = course.lectures.find(
+      (lecture) => !lecture.is_completed
+    );
+
+    if (nextLecture) {
+      return { lectureId: nextLecture.id };
     }
 
     // If all lectures are completed, return the first lecture
-    if (course.sections.length > 0 && course.sections[0].lectures.length > 0) {
-      return {
-        sectionId: course.sections[0].id,
-        lectureId: course.sections[0].lectures[0].id,
-      };
+    if (course.lectures.length > 0) {
+      return { lectureId: course.lectures[0].id };
     }
 
     return null;
@@ -354,7 +235,7 @@ export default function CourseDetailsPage() {
   const handleContinueLearning = () => {
     if (nextLecture) {
       router.push(
-        `/student/courses/${courseId}/learn/${nextLecture.sectionId}/${nextLecture.lectureId}`
+        `/student/courses/${courseId}/learn/${nextLecture.lectureId}`
       );
     }
   };
@@ -408,8 +289,8 @@ export default function CourseDetailsPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="relative rounded-lg overflow-hidden h-[300px] w-full">
             <Image
-              src={course.thumbnail}
-              alt={course.title}
+              src={course.thumbnail_url}
+              alt={course.course_name}
               fill
               className="object-cover"
             />
@@ -422,13 +303,13 @@ export default function CourseDetailsPage() {
           </div>
 
           <div>
-            <h1 className="text-3xl font-bold mb-2">{course.title}</h1>
+            <h1 className="text-3xl font-bold mb-2">{course.course_name}</h1>
             <p className="text-muted-foreground mb-4">{course.description}</p>
 
             <div className="flex flex-wrap gap-4 text-sm">
               <div className="flex items-center gap-1">
                 <User className="h-4 w-4 text-muted-foreground" />
-                <span>Instructor: {course.instructor.name}</span>
+                <span>Instructor: {course.instructor.teacher_name}</span>
               </div>
               <div className="flex items-center gap-1">
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
@@ -436,7 +317,7 @@ export default function CourseDetailsPage() {
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                <span>{course.total_duration}</span>
+                <span>Progress: {course.progress_percent}%</span>
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -467,78 +348,50 @@ export default function CourseDetailsPage() {
             </TabsList>
 
             <TabsContent value="content" className="space-y-4 pt-4">
-              <Accordion type="multiple" className="w-full">
-                {course.sections.map((section, index) => (
-                  <AccordionItem key={section.id} value={section.id}>
-                    <AccordionTrigger className="hover:bg-muted/50 px-4 py-2 rounded-md">
-                      <div className="flex flex-col items-start text-left">
-                        <div className="font-medium">
-                          Section {index + 1}: {section.title}
-                        </div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
-                          <span>{section.lectures.length} lectures</span>
-                          <span>•</span>
-                          <div className="flex items-center">
-                            <Progress
-                              value={section.progress}
-                              className="h-1.5 w-16 mr-2"
-                            />
-                            <span>{section.progress}%</span>
+              <div className="border rounded-md divide-y">
+                {course.lectures.map((lecture, index) => (
+                  <Link
+                    key={lecture.id}
+                    href={`/student/courses/${courseId}/learn/${lecture.id}`}
+                  >
+                    <div
+                      className={`flex items-center justify-between p-4 hover:bg-muted/50 ${
+                        lecture.is_completed ? "bg-muted/20" : ""
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {lecture.is_completed ? (
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                        ) : (
+                          <PlayCircle className="h-5 w-5 text-muted-foreground" />
+                        )}
+                        <div>
+                          <div className="font-medium">
+                            {index + 1}. {lecture.title}
+                          </div>
+                          <div className="text-xs text-muted-foreground flex items-center gap-2">
+                            <span>{lecture.content_type}</span>
+                            <span>•</span>
+                            <span>{lecture.description}</span>
                           </div>
                         </div>
                       </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-4">
-                      <div className="space-y-1 py-2">
-                        {section.lectures.map((lecture) => (
-                          <Link
-                            key={lecture.id}
-                            href={`/student/courses/${courseId}/learn/${section.id}/${lecture.id}`}
+                      <div className="text-sm text-muted-foreground flex items-center gap-2">
+                        {lecture.is_completed ? (
+                          <Badge
+                            variant="success"
+                            className="bg-green-100 text-green-800"
                           >
-                            <div
-                              className={`flex items-center justify-between p-2 rounded-md hover:bg-muted/50 ${
-                                lecture.is_completed ? "bg-muted/20" : ""
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                {lecture.is_completed ? (
-                                  <CheckCircle className="h-5 w-5 text-green-500" />
-                                ) : (
-                                  <PlayCircle className="h-5 w-5 text-muted-foreground" />
-                                )}
-                                <div>
-                                  <div className="font-medium">
-                                    {lecture.title}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground flex items-center gap-2">
-                                    <span>{lecture.type}</span>
-                                    <span>•</span>
-                                    <span>{lecture.duration}</span>
-                                    {lecture.is_preview && (
-                                      <>
-                                        <span>•</span>
-                                        <Badge
-                                          variant="outline"
-                                          className="text-xs py-0 h-5"
-                                        >
-                                          Preview
-                                        </Badge>
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="text-sm text-muted-foreground">
-                                {lecture.is_completed ? "Completed" : ""}
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
+                            Completed
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">Not completed</Badge>
+                        )}
                       </div>
-                    </AccordionContent>
-                  </AccordionItem>
+                    </div>
+                  </Link>
                 ))}
-              </Accordion>
+              </div>
             </TabsContent>
 
             <TabsContent value="announcements" className="space-y-4 pt-4">
@@ -583,12 +436,12 @@ export default function CourseDetailsPage() {
                         <div>
                           <div className="font-medium">{resource.title}</div>
                           <div className="text-xs text-muted-foreground">
-                            {resource.type.toUpperCase()} • {resource.size}
+                            {resource.content_type.toUpperCase()}
                           </div>
                         </div>
                       </div>
                       <Button variant="outline" size="sm" asChild>
-                        <Link href={resource.url}>
+                        <Link href={resource.content_url}>
                           <Download className="h-4 w-4 mr-1" />
                           Download
                         </Link>
@@ -621,19 +474,17 @@ export default function CourseDetailsPage() {
                 <div className="relative h-12 w-12 rounded-full overflow-hidden">
                   <Image
                     src={course.instructor.avatar}
-                    alt={course.instructor.name}
+                    alt={course.instructor.teacher_name}
                     fill
                     className="object-cover"
                   />
                 </div>
                 <div>
-                  <h3 className="font-medium">{course.instructor.name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {course.instructor.title}
-                  </p>
+                  <h3 className="font-medium">
+                    {course.instructor.teacher_name}
+                  </h3>
                 </div>
               </div>
-              <p className="text-sm">{course.instructor.bio}</p>
             </CardContent>
           </Card>
 

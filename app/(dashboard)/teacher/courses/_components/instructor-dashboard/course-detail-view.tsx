@@ -131,13 +131,13 @@ CourseDetailViewProps) {
               </p>
             </div>
           </div>
-          <div className="flex items-center bg-white p-3 rounded-lg shadow-sm flex-1">
+          {/* <div className="flex items-center bg-white p-3 rounded-lg shadow-sm flex-1">
             <Users className="h-5 w-5 text-primary mr-3" />
             <div>
               <p className="text-xs text-muted-foreground">Enrolled Students</p>
               <p className="font-medium">0 students</p>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 

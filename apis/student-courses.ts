@@ -9,19 +9,11 @@ export interface IApiResponse<T> {
 export interface Lecture {
   id: string;
   title: string;
-  type: string;
-  duration: string;
+  content_type: string;
   is_completed: boolean;
-  is_preview?: boolean;
-  video_url?: string;
-  content?: string;
-  attachments?: {
-    id: string;
-    title: string;
-    type: string;
-    size: string;
-    url: string;
-  }[];
+  content_url?: string;
+  description?: string;
+  order_index?: number;
 }
 
 export interface Section {
@@ -33,18 +25,15 @@ export interface Section {
 }
 
 export interface Instructor {
-  name: string;
+  teacher_name: string;
   avatar: string;
-  title: string;
-  bio: string;
 }
 
 export interface Resource {
   id: string;
   title: string;
-  type: string;
-  size: string;
-  url: string;
+  content_type: string;
+  content_url: string;
 }
 
 export interface Announcement {
@@ -55,22 +44,19 @@ export interface Announcement {
 }
 
 export interface CourseDetails {
-  id: string;
-  title: string;
+  course_id: string;
+  course_name: string;
   description: string;
-  thumbnail: string;
+  thumbnail_url: string;
   instructor: Instructor;
-  progress: number;
+  progress_percent: number;
   total_lectures: number;
   completed_lectures: number;
-  total_duration: string;
   last_accessed: string;
   created_at: string;
   updated_at: string;
-  category: string;
-  level: string;
   status: string;
-  sections: Section[];
+  lectures: Lecture[];
   announcements: Announcement[];
   resources: Resource[];
 }
@@ -106,17 +92,33 @@ export const getEnrolledCourses = async (): Promise<
 };
 
 export const getCourseDetails = async (
-  courseId: string
+  courseId: string,
+  studentId?: string
 ): Promise<IApiResponse<CourseDetails>> => {
   try {
-    const result = await axiosInstance.get(
-      endpoints.student.get_course_details(courseId),
-      {
-        withCredentials: true,
-      }
-    );
+    // Construct the URL with optional studentId parameter
+    let url = endpoints.student.get_course_details(courseId);
+    if (studentId) {
+      url += `?studentId=${studentId}`;
+    }
+
+    const result = await axiosInstance.get(url, {
+      withCredentials: true,
+    });
+
+    // Return the API response directly since the backend now returns data in the correct format
     return result.data;
+
+    // For development/testing with mock data, uncomment the following:
+    /*
+    return {
+      status: 200,
+      message: "Course details retrieved successfully",
+      data: mockCourseDetails as CourseDetails,
+    };
+    */
   } catch (error) {
+    console.error("Error fetching course details:", error);
     throw error;
   }
 };

@@ -105,7 +105,8 @@ export const endpoints = {
   },
   student: {
     get_enrolled_courses: `student/courses`,
-    get_course_details: (courseId: string) => `student/courses/${courseId}`,
+    get_course_details: (courseId: string) =>
+      `student/courses-detail/${courseId}`,
     get_course_content: (courseId: string) =>
       `student/courses/${courseId}/content`,
     mark_lecture_completed: (lectureId: string) =>

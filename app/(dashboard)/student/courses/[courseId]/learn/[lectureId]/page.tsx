@@ -4,12 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -28,141 +22,127 @@ import {
   markLectureAsCompleted,
 } from "@/apis/student-courses";
 
-// Mock data for course content
+// Mock data for course content based on actual system structure without sections
 const mockCourseContent = {
-  id: "course-1",
-  title: "Complete Web Development Bootcamp",
-  sections: [
+  id: "550e8400-e29b-41d4-a716-446655440000",
+  title: "Introduction to Web Development",
+  description:
+    "Learn the fundamentals of web development including HTML, CSS, JavaScript, and modern frameworks.",
+  thumbnail:
+    "https://images.unsplash.com/photo-1593720213428-28a5b9e94613?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  instructor: {
+    name: "Nguyen Van A",
+    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    title: "Senior Web Developer",
+    bio: "Experienced web developer with expertise in modern JavaScript frameworks and backend technologies.",
+  },
+  progress: 25,
+  total_lectures: 15,
+  completed_lectures: 4,
+  total_duration: "12h 45m",
+  last_accessed: "2023-06-15T10:30:00Z",
+  created_at: "2023-01-10T08:00:00Z",
+  updated_at: "2023-05-20T14:15:00Z",
+  category: "Web Development",
+  level: "Beginner to Intermediate",
+  status: "in_progress",
+  lectures: [
     {
-      id: "section-1",
-      title: "Web Fundamentals",
-      progress: 100,
-      lectures: [
+      id: "550e8400-e29b-41d4-a716-446655440101",
+      title: "Introduction to HTML",
+      type: "video",
+      duration: "15m",
+      is_completed: true,
+      video_url: "https://www.youtube.com/embed/qz0aGYrrlhU",
+      content:
+        "HTML is the standard markup language for Web pages. With HTML you can create your own Website. HTML is easy to learn - You will enjoy it!",
+      description: "An introduction to HTML structure and basic elements",
+      order_index: 1,
+      attachments: [
         {
-          id: "lecture-1-1",
-          title: "Introduction to HTML",
-          type: "video",
-          duration: "15m",
-          is_completed: true,
-          video_url: "https://www.youtube.com/embed/qz0aGYrrlhU",
-          content:
-            "HTML is the standard markup language for Web pages. With HTML you can create your own Website. HTML is easy to learn - You will enjoy it!",
-          attachments: [
-            {
-              id: "attachment-1-1-1",
-              title: "HTML Cheat Sheet",
-              type: "pdf",
-              size: "1.2 MB",
-              url: "#",
-            },
-          ],
-        },
-        {
-          id: "lecture-1-2",
-          title: "CSS Fundamentals",
-          type: "video",
-          duration: "20m",
-          is_completed: true,
-          video_url: "https://www.youtube.com/embed/1PnVor36_40",
-          content:
-            "CSS is the language we use to style an HTML document. CSS describes how HTML elements should be displayed.",
-          attachments: [
-            {
-              id: "attachment-1-2-1",
-              title: "CSS Reference Guide",
-              type: "pdf",
-              size: "2.5 MB",
-              url: "#",
-            },
-          ],
-        },
-        {
-          id: "lecture-1-3",
-          title: "JavaScript Basics",
-          type: "video",
-          duration: "25m",
-          is_completed: true,
-          video_url: "https://www.youtube.com/embed/W6NZfCO5SIk",
-          content:
-            "JavaScript is the world's most popular programming language. JavaScript is the programming language of the Web.",
-          attachments: [
-            {
-              id: "attachment-1-3-1",
-              title: "JavaScript Basics PDF",
-              type: "pdf",
-              size: "3.1 MB",
-              url: "#",
-            },
-          ],
+          id: "attachment-1-1-1",
+          title: "HTML Cheat Sheet",
+          type: "pdf",
+          size: "1.2 MB",
+          url: "#",
         },
       ],
     },
     {
-      id: "section-2",
-      title: "Responsive Design",
-      progress: 50,
-      lectures: [
+      id: "550e8400-e29b-41d4-a716-446655440102",
+      title: "HTML Elements and Attributes",
+      type: "video",
+      duration: "20m",
+      is_completed: true,
+      video_url: "https://www.youtube.com/embed/1PnVor36_40",
+      content:
+        "CSS is the language we use to style an HTML document. CSS describes how HTML elements should be displayed.",
+      description: "Learn about different HTML elements and their attributes",
+      order_index: 2,
+      attachments: [
         {
-          id: "lecture-2-1",
-          title: "Responsive Design Principles",
-          type: "video",
-          duration: "18m",
-          is_completed: true,
-          video_url: "https://www.youtube.com/embed/srvUrASNj0s",
-          content:
-            "Responsive web design makes your web page look good on all devices. Responsive web design uses only HTML and CSS.",
-          attachments: [
-            {
-              id: "attachment-2-1-1",
-              title: "Responsive Design Guide",
-              type: "pdf",
-              size: "1.8 MB",
-              url: "#",
-            },
-          ],
-        },
-        {
-          id: "lecture-2-2",
-          title: "Media Queries",
-          type: "video",
-          duration: "22m",
-          is_completed: true,
-          video_url: "https://www.youtube.com/embed/2KL-z9A56SQ",
-          content:
-            "Media queries allow you to apply CSS styles depending on a device's general type or specific characteristics.",
-          attachments: [],
-        },
-        {
-          id: "lecture-2-3",
-          title: "Flexbox Layout",
-          type: "video",
-          duration: "28m",
-          is_completed: false,
-          video_url: "https://www.youtube.com/embed/JJSoEo8JSnc",
-          content:
-            "The Flexible Box Layout Module, makes it easier to design flexible responsive layout structure without using float or positioning.",
-          attachments: [
-            {
-              id: "attachment-2-3-1",
-              title: "Flexbox Cheat Sheet",
-              type: "pdf",
-              size: "1.5 MB",
-              url: "#",
-            },
-          ],
-        },
-        {
-          id: "lecture-2-4",
-          title: "CSS Grid Layout",
-          type: "video",
-          duration: "30m",
-          is_completed: false,
-          video_url: "https://www.youtube.com/embed/jV8B24rSN5o",
-          content:
-            "The CSS Grid Layout Module offers a grid-based layout system, with rows and columns, making it easier to design web pages without having to use floats and positioning.",
-          attachments: [],
+          id: "attachment-1-2-1",
+          title: "CSS Reference Guide",
+          type: "pdf",
+          size: "2.5 MB",
+          url: "#",
         },
       ],
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440103",
+      title: "HTML Forms",
+      type: "video",
+      duration: "25m",
+      is_completed: true,
+      video_url: "https://www.youtube.com/embed/W6NZfCO5SIk",
+      content:
+        "JavaScript is the world's most popular programming language. JavaScript is the programming language of the Web.",
+      description: "Creating interactive forms with HTML",
+      order_index: 3,
+      attachments: [
+        {
+          id: "attachment-1-3-1",
+          title: "JavaScript Basics PDF",
+          type: "pdf",
+          size: "3.1 MB",
+          url: "#",
+        },
+      ],
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440201",
+      title: "CSS Basics",
+      type: "video",
+      duration: "18m",
+      is_completed: true,
+      video_url: "https://www.youtube.com/embed/srvUrASNj0s",
+      content:
+        "Responsive web design makes your web page look good on all devices. Responsive web design uses only HTML and CSS.",
+      description: "Introduction to CSS selectors and properties",
+      order_index: 4,
+      attachments: [
+        {
+          id: "attachment-2-1-1",
+          title: "Responsive Design Guide",
+          type: "pdf",
+          size: "1.8 MB",
+          url: "#",
+        },
+      ],
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440202",
+      title: "CSS Box Model",
+      type: "video",
+      duration: "22m",
+      is_completed: false,
+      video_url: "https://www.youtube.com/embed/2KL-z9A56SQ",
+      content:
+        "Media queries allow you to apply CSS styles depending on a device's general type or specific characteristics.",
+      description: "Understanding the CSS box model",
+      order_index: 5,
+      attachments: [],
     },
   ],
 };
@@ -170,14 +150,12 @@ const mockCourseContent = {
 export default function LecturePage() {
   const router = useRouter();
   const params = useParams();
-  const { courseId, sectionId, lectureId } = params;
+  const { courseId, lectureId } = params;
 
   const [course, setCourse] = useState<any>(mockCourseContent);
-  const [currentSection, setCurrentSection] = useState<any>(
-    mockCourseContent.sections[0]
-  );
   const [currentLecture, setCurrentLecture] = useState<any>(
-    mockCourseContent.sections[0].lectures[0]
+    mockCourseContent.lectures.find((l) => l.id === lectureId) ||
+      mockCourseContent.lectures[0]
   );
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -185,24 +163,20 @@ export default function LecturePage() {
   const videoContainerRef = useRef(null);
 
   useEffect(() => {
-    // Simulate API call to fetch course content
+    // Fetch course content from API
     const fetchCourseContent = async () => {
       try {
-        // Fetch course content from API
+        setLoading(true);
         const response = await getCourseContent(courseId as string);
         setCourse(response.data);
 
-        // Find current section and lecture
-        const section = response.data.sections.find(
-          (s: any) => s.id === sectionId
+        // Find current lecture
+        const lecture = response.data.lectures.find(
+          (l: any) => l.id === lectureId
         );
-        if (section) {
-          setCurrentSection(section);
-
-          const lecture = section.lectures.find((l: any) => l.id === lectureId);
-          if (lecture) {
-            setCurrentLecture(lecture);
-          }
+        console.log("lecture", lecture);
+        if (lecture) {
+          setCurrentLecture(lecture);
         }
 
         setLoading(false);
@@ -212,10 +186,17 @@ export default function LecturePage() {
       }
     };
 
-    if (courseId && sectionId && lectureId) {
+    if (courseId && lectureId) {
       fetchCourseContent();
+
+      // Uncomment for development with mock data
+      // setCurrentLecture(
+      //   mockCourseContent.lectures.find((l) => l.id === lectureId) ||
+      //     mockCourseContent.lectures[0]
+      // );
+      // setLoading(false);
     }
-  }, [courseId, sectionId, lectureId]);
+  }, [courseId, lectureId]);
 
   // Handle lecture completion
   const handleLectureComplete = async () => {
@@ -237,29 +218,20 @@ export default function LecturePage() {
 
   // Find next and previous lectures
   const findAdjacentLectures = () => {
-    if (!course || !currentSection || !currentLecture)
-      return { prev: null, next: null };
+    if (!course || !currentLecture) return { prev: null, next: null };
 
-    const allLectures = [];
-    course.sections.forEach((section) => {
-      section.lectures.forEach((lecture) => {
-        allLectures.push({
-          sectionId: section.id,
-          lectureId: lecture.id,
-          title: lecture.title,
-        });
-      });
-    });
-
-    const currentIndex = allLectures.findIndex(
-      (l) => l.sectionId === sectionId && l.lectureId === lectureId
+    // Sort lectures by order_index
+    const sortedLectures = [...course.lectures].sort(
+      (a, b) => a.order_index - b.order_index
     );
 
+    const currentIndex = sortedLectures.findIndex((l) => l.id === lectureId);
+
     return {
-      prev: currentIndex > 0 ? allLectures[currentIndex - 1] : null,
+      prev: currentIndex > 0 ? sortedLectures[currentIndex - 1] : null,
       next:
-        currentIndex < allLectures.length - 1
-          ? allLectures[currentIndex + 1]
+        currentIndex < sortedLectures.length - 1
+          ? sortedLectures[currentIndex + 1]
           : null,
     };
   };
@@ -269,14 +241,9 @@ export default function LecturePage() {
   // Navigate to next or previous lecture
   const navigateToLecture = (direction) => {
     if (direction === "prev" && prev) {
-      //http://localhost:3000/student/courses/course-1/learn/section-2/lecture-2-3
-      router.push(
-        `/student/courses/${courseId}/learn/${prev.sectionId}/${prev.lectureId}`
-      );
+      router.push(`/student/courses/${courseId}/learn/${prev.id}`);
     } else if (direction === "next" && next) {
-      router.push(
-        `/student/courses/${courseId}/learn/${next.sectionId}/${next.lectureId}`
-      );
+      router.push(`/student/courses/${courseId}/learn/${next.id}`);
     }
   };
 
@@ -284,15 +251,10 @@ export default function LecturePage() {
   const calculateProgress = () => {
     if (!course) return 0;
 
-    let total = 0;
-    let completed = 0;
-
-    course.sections.forEach((section) => {
-      section.lectures.forEach((lecture) => {
-        total++;
-        if (lecture.is_completed) completed++;
-      });
-    });
+    const total = course.lectures.length;
+    const completed = course.lectures.filter(
+      (lecture) => lecture.is_completed
+    ).length;
 
     return total > 0 ? Math.round((completed / total) * 100) : 0;
   };
@@ -305,7 +267,7 @@ export default function LecturePage() {
     );
   }
 
-  if (!course || !currentSection || !currentLecture) {
+  if (!course || !currentLecture) {
     return (
       <div className="container mx-auto py-6">
         <div className="flex items-center mb-6">
@@ -319,8 +281,8 @@ export default function LecturePage() {
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold mb-2">Lecture Not Found</h2>
           <p className="text-muted-foreground mb-6">
-            The lecture you're looking for doesn't exist or you don't have
-            access to it.
+            The lecture you&apos;re looking for doesn&apos;t exist or you
+            don&apos;t have access to it.
           </p>
           <Link href={`/student/courses/${courseId}`}>
             <Button>Go Back to Course</Button>
@@ -362,70 +324,42 @@ export default function LecturePage() {
               <h2 className="font-medium">Course Content</h2>
             </div>
             <div className="flex-1 overflow-y-auto">
-              <Accordion
-                type="multiple"
-                defaultValue={[currentSection.id]}
-                className="w-full"
-              >
-                {mockCourseContent.sections.map((section, index) => (
-                  <AccordionItem key={section.id} value={section.id}>
-                    <AccordionTrigger className="px-4 py-2 hover:bg-muted/50">
-                      <div className="flex flex-col items-start text-left">
-                        <div className="font-medium">
-                          Section {index + 1}: {section.title}
-                        </div>
-                        <div className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
-                          <span>{section.lectures.length} lectures</span>
-                          <span>•</span>
-                          <div className="flex items-center">
-                            <Progress
-                              value={section.progress}
-                              className="h-1.5 w-12 mr-1"
-                            />
-                            <span>{section.progress}%</span>
+              <div className="space-y-0">
+                {course.lectures
+                  .sort((a, b) => a.order_index - b.order_index)
+                  .map((lecture, index) => (
+                    <Link
+                      key={lecture.id}
+                      href={`/student/courses/${courseId}/learn/${lecture.id}`}
+                    >
+                      <div
+                        className={`flex items-center gap-3 p-3 hover:bg-muted/50 border-l-2 ${
+                          lecture.id === lectureId
+                            ? "border-primary bg-muted/30"
+                            : lecture.is_completed
+                            ? "border-green-500/50 bg-muted/10"
+                            : "border-transparent"
+                        }`}
+                      >
+                        {lecture.is_completed ? (
+                          <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        ) : (
+                          <PlayCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium truncate">
+                            {index + 1}. {lecture.title}
+                          </div>
+                          <div className="text-xs text-muted-foreground flex items-center gap-1">
+                            <span>{lecture.type}</span>
+                            <span>•</span>
+                            <span>{lecture.duration}</span>
                           </div>
                         </div>
                       </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-0">
-                      <div className="space-y-0">
-                        {section.lectures.map((lecture) => (
-                          <Link
-                            key={lecture.id}
-                            href={`/student/courses/${courseId}/learn/${section.id}/${lecture.id}`}
-                          >
-                            <div
-                              className={`flex items-center gap-3 p-3 hover:bg-muted/50 border-l-2 ${
-                                lecture.id === lectureId
-                                  ? "border-primary bg-muted/30"
-                                  : lecture.is_completed
-                                  ? "border-green-500/50 bg-muted/10"
-                                  : "border-transparent"
-                              }`}
-                            >
-                              {lecture.is_completed ? (
-                                <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                              ) : (
-                                <PlayCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                              )}
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium truncate">
-                                  {lecture.title}
-                                </div>
-                                <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                  <span>{lecture.type}</span>
-                                  <span>•</span>
-                                  <span>{lecture.duration}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+                    </Link>
+                  ))}
+              </div>
             </div>
           </aside>
         )}
@@ -439,8 +373,7 @@ export default function LecturePage() {
           {/* Video Player */}
           <div className="h-[60vh] bg-black">
             <VideoPlayer
-              // src={currentLecture.video_url}
-              src="https://www.youtube.com/watch?v=kmy_YNhl0mw&t=10796s"
+              src={currentLecture.content_url}
               title={currentLecture.title}
               onComplete={handleLectureComplete}
               autoMarkComplete={true}
@@ -457,6 +390,11 @@ export default function LecturePage() {
                   <Badge
                     variant={
                       currentLecture.is_completed ? "success" : "outline"
+                    }
+                    className={
+                      currentLecture.is_completed
+                        ? "bg-green-100 text-green-800"
+                        : ""
                     }
                   >
                     {currentLecture.is_completed ? "Completed" : "In Progress"}
@@ -499,6 +437,12 @@ export default function LecturePage() {
                   <TabsContent value="notes" className="pt-4">
                     <div className="prose max-w-none">
                       <p>{currentLecture.content}</p>
+                      {currentLecture.description && (
+                        <div className="mt-4">
+                          <h3 className="text-lg font-medium">Description</h3>
+                          <p>{currentLecture.description}</p>
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
                   <TabsContent value="attachments" className="pt-4">
@@ -537,7 +481,8 @@ export default function LecturePage() {
                           No attachments available
                         </h3>
                         <p className="text-muted-foreground mt-1">
-                          This lecture doesn't have any downloadable attachments
+                          This lecture doesn&apos;t have any downloadable
+                          attachments
                         </p>
                       </div>
                     )}
