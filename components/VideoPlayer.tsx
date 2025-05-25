@@ -26,6 +26,11 @@ interface VideoPlayerProps {
   autoMarkComplete?: boolean;
   autoMarkCompleteThreshold?: number; // percentage of video watched to mark as complete
   youtubeVideoId?: string; // YouTube video ID for YouTube videos
+  lectureId?: string; // Lecture ID for progress tracking
+  onProgressUpdate?: (
+    watchPosition: number,
+    progressPercentage: number
+  ) => void;
 }
 
 // HTML5 Video Player Component (for non-YouTube videos)
@@ -35,6 +40,8 @@ function HTML5VideoPlayer({
   onComplete,
   autoMarkComplete = true,
   autoMarkCompleteThreshold = 80,
+  lectureId,
+  onProgressUpdate,
 }: Omit<VideoPlayerProps, "youtubeVideoId">) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -102,6 +109,14 @@ function HTML5VideoPlayer({
       // Track maximum progress
       if (newProgress > maxProgressReached) {
         setMaxProgressReached(newProgress);
+
+        // Call progress update callback
+        if (onProgressUpdate && lectureId) {
+          onProgressUpdate(
+            Math.floor(video.currentTime),
+            Math.floor(newProgress)
+          );
+        }
       }
 
       // Auto mark as complete when threshold is reached
@@ -142,6 +157,8 @@ function HTML5VideoPlayer({
     maxProgressReached,
     onComplete,
     autoMarkCompleteThreshold,
+    lectureId,
+    onProgressUpdate,
   ]);
 
   // Handle fullscreen change
@@ -391,6 +408,8 @@ export default function VideoPlayer({
   autoMarkComplete = true,
   autoMarkCompleteThreshold = 80,
   youtubeVideoId,
+  lectureId,
+  onProgressUpdate,
 }: VideoPlayerProps) {
   console.log("src", src);
 
@@ -407,6 +426,8 @@ export default function VideoPlayer({
         onComplete={onComplete}
         autoMarkComplete={autoMarkComplete}
         autoMarkCompleteThreshold={autoMarkCompleteThreshold}
+        lectureId={lectureId}
+        onProgressUpdate={onProgressUpdate}
       />
     );
   }
@@ -419,6 +440,8 @@ export default function VideoPlayer({
       onComplete={onComplete}
       autoMarkComplete={autoMarkComplete}
       autoMarkCompleteThreshold={autoMarkCompleteThreshold}
+      lectureId={lectureId}
+      onProgressUpdate={onProgressUpdate}
     />
   );
 }

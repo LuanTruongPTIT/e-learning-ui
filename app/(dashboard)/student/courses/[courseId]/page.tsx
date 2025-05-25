@@ -154,7 +154,7 @@ export default function CourseDetailsPage() {
   const params = useParams();
   const courseId = params.courseId;
 
-  const [course, setCourse] = useState<CourseDetails | null>(mockCourseDetails);
+  const [course, setCourse] = useState<CourseDetails | null>();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("content");
 
@@ -164,6 +164,7 @@ export default function CourseDetailsPage() {
       try {
         setLoading(true);
         const response = await getCourseDetails(courseId as string);
+        console.log(response);
         setCourse(response.data);
         setLoading(false);
       } catch (error) {
@@ -194,7 +195,7 @@ export default function CourseDetailsPage() {
 
     const total = course.lectures.length;
     const completed = course.lectures.filter(
-      (lecture) => lecture.is_completed
+      (lecture) => lecture.isCompleted
     ).length;
 
     return {
@@ -213,9 +214,7 @@ export default function CourseDetailsPage() {
     if (!course) return null;
 
     // Find the first incomplete lecture
-    const nextLecture = course.lectures.find(
-      (lecture) => !lecture.is_completed
-    );
+    const nextLecture = course.lectures.find((lecture) => !lecture.isCompleted);
 
     if (nextLecture) {
       return { lectureId: nextLecture.id };
@@ -289,8 +288,8 @@ export default function CourseDetailsPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="relative rounded-lg overflow-hidden h-[300px] w-full">
             <Image
-              src={course.thumbnail_url}
-              alt={course.course_name}
+              src={course.thumbnailUrl}
+              alt={course.courseName}
               fill
               className="object-cover"
             />
@@ -303,7 +302,7 @@ export default function CourseDetailsPage() {
           </div>
 
           <div>
-            <h1 className="text-3xl font-bold mb-2">{course.course_name}</h1>
+            <h1 className="text-3xl font-bold mb-2">{course.courseName}</h1>
             <p className="text-muted-foreground mb-4">{course.description}</p>
 
             <div className="flex flex-wrap gap-4 text-sm">
@@ -317,7 +316,7 @@ export default function CourseDetailsPage() {
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                <span>Progress: {course.progress_percent}%</span>
+                <span>Progress: {course.progressPercent}%</span>
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -336,7 +335,7 @@ export default function CourseDetailsPage() {
               <span>
                 {progress.completed}/{progress.total} lectures completed
               </span>
-              <span>Last accessed: {formatDate(course.last_accessed)}</span>
+              <span>Last accessed: {formatDate(course.lastAccessed)}</span>
             </div>
           </div>
 
@@ -356,11 +355,11 @@ export default function CourseDetailsPage() {
                   >
                     <div
                       className={`flex items-center justify-between p-4 hover:bg-muted/50 ${
-                        lecture.is_completed ? "bg-muted/20" : ""
+                        lecture.isCompleted ? "bg-muted/20" : ""
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        {lecture.is_completed ? (
+                        {lecture.isCompleted ? (
                           <CheckCircle className="h-5 w-5 text-green-500" />
                         ) : (
                           <PlayCircle className="h-5 w-5 text-muted-foreground" />
@@ -370,14 +369,14 @@ export default function CourseDetailsPage() {
                             {index + 1}. {lecture.title}
                           </div>
                           <div className="text-xs text-muted-foreground flex items-center gap-2">
-                            <span>{lecture.content_type}</span>
+                            <span>{lecture.contentType}</span>
                             <span>•</span>
                             <span>{lecture.description}</span>
                           </div>
                         </div>
                       </div>
                       <div className="text-sm text-muted-foreground flex items-center gap-2">
-                        {lecture.is_completed ? (
+                        {lecture.isCompleted ? (
                           <Badge
                             variant="success"
                             className="bg-green-100 text-green-800"

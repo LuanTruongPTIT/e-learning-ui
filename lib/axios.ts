@@ -111,6 +111,8 @@ export const endpoints = {
       `student/courses/${courseId}/content`,
     mark_lecture_completed: (lectureId: string) =>
       `student/lectures/${lectureId}/complete`,
+    update_lecture_progress: (lectureId: string) =>
+      `student/lectures/${lectureId}/progress`,
     // Dashboard endpoints
     get_dashboard_data: `student/dashboard`,
     get_dashboard_stats: `student/dashboard/stats`,

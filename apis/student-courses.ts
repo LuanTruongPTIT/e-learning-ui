@@ -9,9 +9,9 @@ export interface IApiResponse<T> {
 export interface Lecture {
   id: string;
   title: string;
-  content_type: string;
-  is_completed: boolean;
-  content_url?: string;
+  contentType: string;
+  isCompleted: boolean;
+  contentUrl?: string;
   description?: string;
   order_index?: number;
 }
@@ -44,17 +44,17 @@ export interface Announcement {
 }
 
 export interface CourseDetails {
-  course_id: string;
-  course_name: string;
+  courseId: string;
+  courseName: string;
   description: string;
-  thumbnail_url: string;
+  thumbnailUrl: string;
   instructor: Instructor;
-  progress_percent: number;
-  total_lectures: number;
-  completed_lectures: number;
-  last_accessed: string;
-  created_at: string;
-  updated_at: string;
+  progressPercent: number;
+  totalLectures: number;
+  completedLectures: number;
+  lastAccessed: string;
+  createdAt: string;
+  updatedAt: string;
   status: string;
   lectures: Lecture[];
   announcements: Announcement[];
@@ -146,6 +146,30 @@ export const markLectureAsCompleted = async (
     const result = await axiosInstance.post(
       endpoints.student.mark_lecture_completed(lectureId),
       {},
+      { withCredentials: true }
+    );
+    return result.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export interface UpdateLectureProgressRequest {
+  watchPosition: number; // Position in seconds
+  progressPercentage: number; // Percentage watched (0-100)
+}
+
+export const updateLectureProgress = async (
+  lectureId: string,
+  progressData: UpdateLectureProgressRequest
+): Promise<IApiResponse<{ success: boolean }>> => {
+  try {
+    const result = await axiosInstance.post(
+      endpoints.student.update_lecture_progress(lectureId),
+      {
+        WatchPosition: progressData.watchPosition,
+        ProgressPercentage: progressData.progressPercentage,
+      },
       { withCredentials: true }
     );
     return result.data;

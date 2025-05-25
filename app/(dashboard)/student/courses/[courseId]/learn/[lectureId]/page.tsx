@@ -20,6 +20,8 @@ import VideoPlayer from "@/components/VideoPlayer";
 import {
   getCourseContent,
   markLectureAsCompleted,
+  updateLectureProgress,
+  UpdateLectureProgressRequest,
 } from "@/apis/student-courses";
 
 // Mock data for course content based on actual system structure without sections
@@ -160,6 +162,7 @@ export default function LecturePage() {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
+  const [markingComplete, setMarkingComplete] = useState(false);
   const videoContainerRef = useRef(null);
 
   useEffect(() => {
@@ -200,18 +203,49 @@ export default function LecturePage() {
 
   // Handle lecture completion
   const handleLectureComplete = async () => {
-    if (currentLecture && !currentLecture.is_completed) {
+    if (currentLecture && !currentLecture.is_completed && !markingComplete) {
       try {
+        setMarkingComplete(true);
         // Call API to mark lecture as completed
         await markLectureAsCompleted(currentLecture.id);
 
         // Update local state
-        setCurrentLecture((prev) => ({
+        setCurrentLecture((prev: any) => ({
           ...prev,
           is_completed: true,
         }));
+
+        // Show success message
+        alert("Lecture marked as completed successfully!");
       } catch (error) {
         console.error("Error marking lecture as completed:", error);
+        alert("Failed to mark lecture as completed. Please try again.");
+      } finally {
+        setMarkingComplete(false);
+      }
+    }
+  };
+
+  // Handle progress update during video playback
+  const handleProgressUpdate = async (
+    watchPosition: number,
+    progressPercentage: number
+  ) => {
+    if (currentLecture) {
+      try {
+        // Throttle API calls - only update every 10 seconds or 5% progress
+        const shouldUpdate =
+          watchPosition % 10 === 0 || // Every 10 seconds
+          progressPercentage % 5 === 0; // Every 5% progress
+
+        if (shouldUpdate) {
+          await updateLectureProgress(currentLecture.id, {
+            watchPosition,
+            progressPercentage,
+          });
+        }
+      } catch (error) {
+        console.error("Error updating lecture progress:", error);
       }
     }
   };
@@ -378,6 +412,8 @@ export default function LecturePage() {
               onComplete={handleLectureComplete}
               autoMarkComplete={true}
               autoMarkCompleteThreshold={80}
+              lectureId={currentLecture.id}
+              onProgressUpdate={handleProgressUpdate}
             />
           </div>
 
@@ -421,6 +457,29 @@ export default function LecturePage() {
                       Next
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
+
+                    {/* Mark Complete Button */}
+                    {!currentLecture.is_completed && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={handleLectureComplete}
+                        disabled={markingComplete}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        {markingComplete ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                            Marking...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Mark Complete
+                          </>
+                        )}
+                      </Button>
+                    )}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     Duration: {currentLecture.duration}
