@@ -22,6 +22,39 @@ export interface Student {
   program_name?: string;
 }
 
+export interface PaginationInfo {
+  total_count: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+  has_next_page: boolean;
+  has_previous_page: boolean;
+}
+
+export interface StudentsResponse {
+  students: Student[];
+  pagination: PaginationInfo;
+}
+
+// New response structure to match backend
+export interface StudentsApiResponse {
+  status: number;
+  message: string;
+  total: number;
+  data: Student[];
+  pagination: PaginationInfo;
+}
+
+export interface GetStudentsParams {
+  keyword?: string;
+  page?: number;
+  page_size?: number;
+  program_id?: string;
+  account_status?: number;
+  sort_by?: string;
+  sort_order?: "asc" | "desc";
+}
+
 export interface CreateStudentRequest {
   username: string;
   email: string;
@@ -45,12 +78,41 @@ export interface UpdateStudentRequest {
   account_status?: string;
 }
 
-export const getStudents = async (): Promise<IApiResponse<Student[]>> => {
+export const getStudents = async (
+  params?: GetStudentsParams
+): Promise<IApiResponse<StudentsResponse>> => {
   try {
-    const result = await axiosInstance.get(endpoints.students.get_students, {
+    const queryParams = new URLSearchParams();
+
+    if (params?.keyword) queryParams.append("keyword", params.keyword);
+    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.page_size)
+      queryParams.append("page_size", params.page_size.toString());
+    if (params?.program_id) queryParams.append("program_id", params.program_id);
+    if (params?.account_status !== undefined)
+      queryParams.append("account_status", params.account_status.toString());
+    if (params?.sort_by) queryParams.append("sort_by", params.sort_by);
+    if (params?.sort_order) queryParams.append("sort_order", params.sort_order);
+
+    const url = `${endpoints.students.get_students}${
+      queryParams.toString() ? `?${queryParams.toString()}` : ""
+    }`;
+
+    const result = await axiosInstance.get<StudentsApiResponse>(url, {
       withCredentials: true,
     });
-    return result.data;
+
+    // Transform the response to match the expected format
+    const transformedResponse: IApiResponse<StudentsResponse> = {
+      status: result.data.status,
+      message: result.data.message,
+      data: {
+        students: result.data.data,
+        pagination: result.data.pagination,
+      },
+    };
+
+    return transformedResponse;
   } catch (error) {
     throw error;
   }

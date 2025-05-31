@@ -9,14 +9,27 @@ export interface Assignment {
   description?: string;
   deadline: string;
   assignment_type: "upload" | "quiz" | "both";
+  assignmentType: "upload" | "quiz" | "both";
   show_answers: boolean;
+  showAnswers: boolean;
   time_limit_minutes?: number;
+  timeLimitMinutes?: number;
   attachment_urls?: string[];
+  attachmentUrls?: string[];
   max_score: number;
+  maxScore: number;
   is_published: boolean;
+  isPublished: boolean;
   created_at: string;
+  createdAt: string;
   updated_at: string;
+  updatedAt: string;
   created_by: string;
+  createdBy: string;
+  submissions_count?: number;
+  submissionsCount?: number;
+  total_students?: number;
+  totalStudents?: number;
 }
 
 export interface CreateAssignmentRequest {

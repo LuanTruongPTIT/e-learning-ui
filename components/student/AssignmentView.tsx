@@ -25,8 +25,6 @@ import {
   triggerFileDownload,
 } from "@/apis/assignments";
 import { toast } from "react-hot-toast";
-import { format } from "date-fns";
-import { vi } from "date-fns/locale";
 import { UploadButton } from "@/utils/uploadthing";
 
 interface AssignmentViewProps {
@@ -40,6 +38,7 @@ export function AssignmentView({ assignmentId, onBack }: AssignmentViewProps) {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const [downloadingFiles, setDownloadingFiles] = useState<Set<string>>(
     new Set()
   );
@@ -52,8 +51,14 @@ export function AssignmentView({ assignmentId, onBack }: AssignmentViewProps) {
   );
 
   useEffect(() => {
-    fetchAssignmentDetails();
-  }, [assignmentId]);
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      fetchAssignmentDetails();
+    }
+  }, [assignmentId, isClient]);
 
   const fetchAssignmentDetails = async () => {
     try {
@@ -167,7 +172,22 @@ export function AssignmentView({ assignmentId, onBack }: AssignmentViewProps) {
     return new Date(deadline) < new Date();
   };
 
+  const formatDate = (dateString: string) => {
+    if (!isClient) return ""; // Prevent hydration mismatch
+
+    const date = new Date(dateString);
+    return date.toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const getTimeRemaining = (deadline: string) => {
+    if (!isClient) return ""; // Prevent hydration mismatch
+
     const now = new Date();
     const deadlineDate = new Date(deadline);
     const diffTime = deadlineDate.getTime() - now.getTime();
@@ -211,7 +231,7 @@ export function AssignmentView({ assignmentId, onBack }: AssignmentViewProps) {
     }
   };
 
-  if (isLoading) {
+  if (!isClient || isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -277,9 +297,7 @@ export function AssignmentView({ assignmentId, onBack }: AssignmentViewProps) {
                   overdue ? "text-red-600" : "text-gray-900"
                 }`}
               >
-                {format(new Date(assignment.deadline), "dd/MM/yyyy HH:mm", {
-                  locale: vi,
-                })}
+                {formatDate(assignment.deadline)}
               </span>
             </div>
 
@@ -334,39 +352,78 @@ export function AssignmentView({ assignmentId, onBack }: AssignmentViewProps) {
           {assignment.attachmentUrls &&
             assignment.attachmentUrls.length > 0 && (
               <div>
-                <h3 className="font-medium mb-2">Tài liệu đính kèm:</h3>
-                <div className="space-y-2">
+                <h3 className="font-medium mb-3 flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Tài liệu đính kèm ({assignment.attachmentUrls.length} file):
+                </h3>
+                <div className="space-y-3">
                   {assignment.attachmentUrls.map((url, index) => {
                     const isDownloading = downloadingFiles.has(url);
                     const fileName =
                       url.split("/").pop() || `attachment-${index + 1}`;
+                    const fileExtension =
+                      fileName.split(".").pop()?.toLowerCase() || "";
+
+                    // Get file type icon
+                    const getFileIcon = () => {
+                      if (["pdf"].includes(fileExtension)) return "📄";
+                      if (["jpg", "jpeg", "png", "gif"].includes(fileExtension))
+                        return "🖼️";
+                      if (["zip", "rar"].includes(fileExtension)) return "📦";
+                      if (["doc", "docx"].includes(fileExtension)) return "📝";
+                      if (["xls", "xlsx"].includes(fileExtension)) return "📊";
+                      return "📎";
+                    };
 
                     return (
                       <div
                         key={index}
-                        className="flex items-center gap-2 p-2 bg-gray-50 rounded"
+                        className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border hover:shadow-sm transition-all"
                       >
-                        <FileText className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm flex-1" title={url}>
-                          {fileName}
-                        </span>
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <span className="text-2xl">{getFileIcon()}</span>
+                          <div className="flex-1 min-w-0">
+                            <div
+                              className="font-medium text-sm truncate"
+                              title={fileName}
+                            >
+                              {fileName}
+                            </div>
+                            <div
+                              className="text-xs text-gray-500 truncate"
+                              title={url}
+                            >
+                              {url}
+                            </div>
+                          </div>
+                        </div>
                         <Button
                           size="sm"
-                          variant="ghost"
                           onClick={() => handleDownloadFile(url)}
                           disabled={isDownloading}
-                          className="flex items-center gap-1"
+                          className="flex items-center gap-2 ml-3 shrink-0"
+                          variant={isDownloading ? "secondary" : "default"}
                         >
                           {isDownloading ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                              <span className="hidden sm:inline">
+                                Downloading...
+                              </span>
+                            </>
                           ) : (
-                            <Download className="h-4 w-4" />
+                            <>
+                              <Download className="h-4 w-4" />
+                              <span className="hidden sm:inline">Download</span>
+                            </>
                           )}
-                          {isDownloading ? "Downloading..." : "Download"}
                         </Button>
                       </div>
                     );
                   })}
+                </div>
+                <div className="mt-3 p-2 bg-blue-50 rounded text-xs text-blue-700">
+                  💡 Tip: Click vào nút Download để tải file về máy của bạn
                 </div>
               </div>
             )}
@@ -387,11 +444,7 @@ export function AssignmentView({ assignmentId, onBack }: AssignmentViewProps) {
               <div>
                 <span className="text-sm text-gray-600">Thời gian nộp:</span>
                 <p className="font-medium">
-                  {format(
-                    new Date(assignment.submission.submittedAt),
-                    "dd/MM/yyyy HH:mm",
-                    { locale: vi }
-                  )}
+                  {formatDate(assignment.submission.submittedAt)}
                 </p>
               </div>
 

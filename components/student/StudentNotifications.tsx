@@ -18,8 +18,6 @@ import {
 } from "@/apis/student-notifications";
 import { AssignmentView } from "./AssignmentView";
 import { toast } from "react-hot-toast";
-import { format } from "date-fns";
-import { vi } from "date-fns/locale";
 
 interface StudentNotificationsProps {
   pageSize?: number;
@@ -30,6 +28,7 @@ export function StudentNotifications({
 }: StudentNotificationsProps) {
   const [notifications, setNotifications] = useState<StudentNotification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isClient, setIsClient] = useState(false);
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<
     string | null
   >(null);
@@ -37,8 +36,14 @@ export function StudentNotifications({
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    fetchNotifications();
-  }, [currentPage]);
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      fetchNotifications();
+    }
+  }, [currentPage, isClient]);
 
   const fetchNotifications = async () => {
     try {
@@ -107,6 +112,8 @@ export function StudentNotifications({
   };
 
   const formatTimeAgo = (dateString: string) => {
+    if (!isClient) return ""; // Prevent hydration mismatch
+
     const date = new Date(dateString);
     const now = new Date();
     const diffInMinutes = Math.floor(
@@ -122,8 +129,40 @@ export function StudentNotifications({
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays < 7) return `${diffInDays} ngày trước`;
 
-    return format(date, "dd/MM/yyyy", { locale: vi });
+    // Use simple date formatting to avoid locale issues
+    return date.toLocaleDateString("vi-VN");
   };
+
+  const formatDeadline = (dateString: string) => {
+    if (!isClient) return ""; // Prevent hydration mismatch
+
+    const date = new Date(dateString);
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Show loading while client is mounting
+  if (!isClient) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Thông báo
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // If viewing an assignment, show the assignment view
   if (selectedAssignmentId) {
@@ -186,12 +225,7 @@ export function StudentNotifications({
                             </Badge>
                             {notification.deadline && (
                               <span className="text-xs text-gray-500">
-                                Hạn:{" "}
-                                {format(
-                                  new Date(notification.deadline),
-                                  "dd/MM HH:mm",
-                                  { locale: vi }
-                                )}
+                                Hạn: {formatDeadline(notification.deadline)}
                               </span>
                             )}
                           </div>
@@ -201,19 +235,15 @@ export function StudentNotifications({
                           <span className="text-xs text-gray-500">
                             {formatTimeAgo(notification.createdAt)}
                           </span>
-
-                          <div className="flex items-center gap-2">
-                            {notification.isNew && (
-                              <Badge variant="default" className="text-xs">
-                                Mới
-                              </Badge>
-                            )}
-                            {notification.assignmentId && (
-                              <ChevronRight className="h-4 w-4 text-gray-400" />
-                            )}
-                          </div>
+                          {notification.isNew && (
+                            <Badge variant="secondary" className="text-xs">
+                              Mới
+                            </Badge>
+                          )}
                         </div>
                       </div>
+
+                      <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0 ml-2" />
                     </div>
                   </div>
                 </div>
@@ -226,10 +256,11 @@ export function StudentNotifications({
                   variant="outline"
                   onClick={loadMore}
                   disabled={isLoading}
+                  className="w-full"
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Đang tải...
                     </>
                   ) : (

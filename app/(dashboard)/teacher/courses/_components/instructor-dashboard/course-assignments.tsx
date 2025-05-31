@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -37,112 +37,73 @@ import {
   Clock,
   FileText,
   ArrowUpDown,
+  GraduationCap,
 } from "lucide-react";
 import { format, isAfter, isBefore } from "date-fns";
 import { vi } from "date-fns/locale";
 import CreateAssignmentModal from "./create-assignment-modal";
-import { toast } from "@/components/ui/toast";
-
-interface Assignment {
-  id: string;
-  course_id: string;
-  title: string;
-  description: string;
-  deadline: Date;
-  assignment_type: "quiz" | "upload" | "both";
-  show_answers: boolean;
-  time_limit?: number;
-  attachment_urls: string[];
-  created_at: Date;
-  updated_at: Date;
-  submissions_count: number;
-  total_students: number;
-}
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import { assignmentApi, Assignment } from "@/apis/assignments";
 
 interface CourseAssignmentsProps {
   courseId: string;
 }
 
-// Mock data for assignments
-const mockAssignments: Assignment[] = [
-  {
-    id: "assignment-1",
-    course_id: "course-1",
-    title: "Bài tập JavaScript cơ bản",
-    description:
-      "Hoàn thành các bài tập về biến, hàm và vòng lặp trong JavaScript",
-    deadline: new Date("2024-02-15T23:59:00"),
-    assignment_type: "upload",
-    show_answers: false,
-    attachment_urls: ["https://example.com/assignment1.pdf"],
-    created_at: new Date("2024-01-20T10:00:00"),
-    updated_at: new Date("2024-01-20T10:00:00"),
-    submissions_count: 18,
-    total_students: 24,
-  },
-  {
-    id: "assignment-2",
-    course_id: "course-1",
-    title: "Quiz: Kiến thức HTML/CSS",
-    description: "Kiểm tra kiến thức cơ bản về HTML và CSS",
-    deadline: new Date("2024-02-20T15:30:00"),
-    assignment_type: "quiz",
-    show_answers: true,
-    time_limit: 45,
-    attachment_urls: [],
-    created_at: new Date("2024-01-25T14:00:00"),
-    updated_at: new Date("2024-01-25T14:00:00"),
-    submissions_count: 22,
-    total_students: 24,
-  },
-  {
-    id: "assignment-3",
-    course_id: "course-1",
-    title: "Dự án cuối khóa",
-    description:
-      "Xây dựng một website hoàn chỉnh sử dụng HTML, CSS và JavaScript",
-    deadline: new Date("2024-03-01T23:59:00"),
-    assignment_type: "both",
-    show_answers: false,
-    time_limit: 120,
-    attachment_urls: [
-      "https://example.com/project-requirements.pdf",
-      "https://example.com/template.zip",
-    ],
-    created_at: new Date("2024-02-01T09:00:00"),
-    updated_at: new Date("2024-02-01T09:00:00"),
-    submissions_count: 5,
-    total_students: 24,
-  },
-];
-
 export default function CourseAssignments({
   courseId,
 }: CourseAssignmentsProps) {
-  const [assignments, setAssignments] = useState<Assignment[]>(mockAssignments);
-  // const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("deadline");
   const [sortOrder, setSortOrder] = useState("asc");
   const [filterStatus, setFilterStatus] = useState("all");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
+  // Fetch assignments from API
+  const fetchAssignments = async () => {
+    try {
+      setLoading(true);
+      const response = await assignmentApi.getAssignmentsByCourse(courseId);
+
+      if (response.status === 200) {
+        setAssignments(response.data);
+      } else {
+        toast.error("Failed to load assignments");
+      }
+    } catch (error) {
+      console.error("Error fetching assignments:", error);
+      toast.error("Failed to load assignments");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (courseId) {
+      fetchAssignments();
+    }
+  }, [courseId]);
+
   // Filter and sort assignments
   const filteredAssignments = assignments
     .filter((assignment) => {
       const matchesSearch =
         assignment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        assignment.description
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
+        (assignment.description?.toLowerCase() || "").includes(
+          searchQuery.toLowerCase()
+        );
 
       if (!matchesSearch) return false;
 
       if (filterStatus === "all") return true;
 
       const now = new Date();
-      if (filterStatus === "active") return isAfter(assignment.deadline, now);
-      if (filterStatus === "expired") return isBefore(assignment.deadline, now);
+      const deadline = new Date(assignment.deadline);
+      if (filterStatus === "active") return isAfter(deadline, now);
+      if (filterStatus === "expired") return isBefore(deadline, now);
 
       return true;
     })
@@ -155,16 +116,16 @@ export default function CourseAssignments({
           bValue = b.title;
           break;
         case "deadline":
-          aValue = a.deadline.getTime();
-          bValue = b.deadline.getTime();
+          aValue = new Date(a.deadline).getTime();
+          bValue = new Date(b.deadline).getTime();
           break;
         case "created_at":
-          aValue = a.created_at.getTime();
-          bValue = b.created_at.getTime();
+          aValue = new Date(a.createdAt || a.created_at).getTime();
+          bValue = new Date(b.createdAt || b.created_at).getTime();
           break;
         case "submissions":
-          aValue = a.submissions_count;
-          bValue = b.submissions_count;
+          aValue = a.submissionsCount ?? a.submissions_count ?? 0;
+          bValue = b.submissionsCount ?? b.submissions_count ?? 0;
           break;
         default:
           return 0;
@@ -181,9 +142,10 @@ export default function CourseAssignments({
         : (bValue as number) - (aValue as number);
     });
 
-  const getStatusBadge = (deadline: Date) => {
+  const getStatusBadge = (deadline: string) => {
     const now = new Date();
-    const isExpired = isBefore(deadline, now);
+    const deadlineDate = new Date(deadline);
+    const isExpired = isBefore(deadlineDate, now);
 
     return (
       <Badge variant={isExpired ? "destructive" : "default"}>
@@ -205,22 +167,26 @@ export default function CourseAssignments({
     }
   };
 
-  const getSubmissionProgress = (submitted: number, total: number) => {
-    const percentage = total > 0 ? Math.round((submitted / total) * 100) : 0;
-    return `${submitted}/${total} (${percentage}%)`;
+  const handleDelete = async (assignmentId: string) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa bài tập này?")) {
+      try {
+        const response = await assignmentApi.deleteAssignment(assignmentId);
+
+        if (response.status === 200) {
+          toast.success("Đã xóa bài tập thành công");
+          fetchAssignments(); // Refresh list
+        } else {
+          toast.error("Có lỗi xảy ra khi xóa bài tập");
+        }
+      } catch (error) {
+        console.error("Error deleting assignment:", error);
+        toast.error("Có lỗi xảy ra khi xóa bài tập");
+      }
+    }
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      // TODO: Implement API call to delete assignment
-      setAssignments((prev) =>
-        prev.filter((assignment) => assignment.id !== id)
-      );
-      toast.success("Xóa bài tập thành công!");
-    } catch (error) {
-      console.error("Error deleting assignment:", error);
-      toast.error("Có lỗi xảy ra khi xóa bài tập");
-    }
+  const handleGradeAssignment = (assignmentId: string) => {
+    router.push(`/teacher/assignments/${assignmentId}/grading`);
   };
 
   const toggleSort = (column: string) => {
@@ -231,6 +197,14 @@ export default function CourseAssignments({
       setSortOrder("asc");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -340,50 +314,88 @@ export default function CourseAssignments({
                     <div>
                       <div className="font-medium flex items-center gap-2">
                         <span>
-                          {getAssignmentTypeIcon(assignment.assignment_type)}
+                          {getAssignmentTypeIcon(
+                            assignment.assignmentType ||
+                              assignment.assignment_type
+                          )}
                         </span>
                         {assignment.title}
                       </div>
                       <div className="text-sm text-muted-foreground line-clamp-2">
                         {assignment.description}
                       </div>
-                      {assignment.time_limit && (
+                      {(assignment.timeLimitMinutes ||
+                        assignment.time_limit_minutes) && (
                         <div className="text-xs text-blue-600 flex items-center gap-1 mt-1">
                           <Clock className="h-3 w-3" />
-                          {assignment.time_limit} phút
+                          {assignment.timeLimitMinutes ||
+                            assignment.time_limit_minutes}{" "}
+                          phút
                         </div>
                       )}
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
-                      {assignment.assignment_type === "quiz" && "Quiz online"}
-                      {assignment.assignment_type === "upload" && "Nộp file"}
-                      {assignment.assignment_type === "both" && "Cả hai"}
+                      {(assignment.assignmentType ||
+                        assignment.assignment_type) === "quiz" && "Quiz online"}
+                      {(assignment.assignmentType ||
+                        assignment.assignment_type) === "upload" && "Nộp file"}
+                      {(assignment.assignmentType ||
+                        assignment.assignment_type) === "both" && "Cả hai"}
                     </div>
-                    {assignment.attachment_urls.length > 0 && (
-                      <div className="text-xs text-muted-foreground flex items-center gap-1">
-                        <FileText className="h-3 w-3" />
-                        {assignment.attachment_urls.length} file
-                      </div>
-                    )}
+                    {(assignment.attachmentUrls ||
+                      assignment.attachment_urls) &&
+                      (assignment.attachmentUrls || assignment.attachment_urls)!
+                        .length > 0 && (
+                        <div className="text-xs text-muted-foreground flex items-center gap-1">
+                          <FileText className="h-3 w-3" />
+                          {
+                            (assignment.attachmentUrls ||
+                              assignment.attachment_urls)!.length
+                          }{" "}
+                          file
+                        </div>
+                      )}
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
-                      {format(assignment.deadline, "dd/MM/yyyy", {
+                      {format(new Date(assignment.deadline), "dd/MM/yyyy", {
                         locale: vi,
                       })}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {format(assignment.deadline, "HH:mm", { locale: vi })}
+                      {format(new Date(assignment.deadline), "HH:mm", {
+                        locale: vi,
+                      })}
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="text-sm font-medium">
-                      {getSubmissionProgress(
-                        assignment.submissions_count,
-                        assignment.total_students
-                      )}
+                      {assignment.submissionsCount ??
+                        assignment.submissions_count ??
+                        0}
+                      /
+                      {assignment.totalStudents ??
+                        assignment.total_students ??
+                        0}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {(assignment.submissionsCount ??
+                        assignment.submissions_count ??
+                        0) ===
+                      (assignment.totalStudents ??
+                        assignment.total_students ??
+                        0)
+                        ? "Hoàn thành"
+                        : `${
+                            (assignment.totalStudents ??
+                              assignment.total_students ??
+                              0) -
+                            (assignment.submissionsCount ??
+                              assignment.submissions_count ??
+                              0)
+                          } chưa nộp`}
                     </div>
                   </TableCell>
                   <TableCell>{getStatusBadge(assignment.deadline)}</TableCell>
@@ -413,6 +425,13 @@ export default function CourseAssignments({
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Xóa
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => handleGradeAssignment(assignment.id)}
+                        >
+                          <GraduationCap className="mr-2 h-4 w-4" />
+                          Chấm điểm
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -446,7 +465,7 @@ export default function CourseAssignments({
         onClose={() => setIsCreateModalOpen(false)}
         courseId={courseId}
         onAssignmentCreated={() => {
-          // TODO: Refresh assignments list
+          fetchAssignments(); // Refresh assignments list
           console.log("Assignment created, refreshing list...");
         }}
       />
