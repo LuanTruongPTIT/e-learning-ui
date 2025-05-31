@@ -48,11 +48,12 @@ export default function LoginPage() {
         }
       }
     } catch (err: any) {
-      console.log(err.status, err.Title, err.detail);
+      console.log(err);
       if (err.status == 400) {
         if (err.title == "Email") {
           setEmailError(err.detail);
         } else if (err.title == "Password") {
+          console.log("Password error:", err.detail);
           setPasswordError(err.detail);
         }
       }

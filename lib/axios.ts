@@ -26,24 +26,21 @@ axiosInstance.interceptors.response.use(
         window.location.href = "/sign-in";
       }
     }
-    return Promise.reject(
-      (error.response && error.response.data) || "Something went wrong"
-    );
+    console.log(error.response.data);
+    return Promise.reject(error.response.data);
   }
 );
-axiosInstance.interceptors.response.use(
-  (res) => res,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      if (typeof window !== "undefined") {
-        window.location.href = "/sign-in"; // ✅ dùng thẳng window
-      }
-    }
-    return Promise.reject(
-      (error.response && error.response.data) || "Something went wrong"
-    );
-  }
-);
+// axiosInstance.interceptors.response.use(
+//   (res) => res,
+//   (error) => {
+//     if (error.response && error.response.status === 401) {
+//       if (typeof window !== "undefined") {
+//         window.location.href = "/sign-in"; // ✅ dùng thẳng window
+//       }
+//     }
+//     return Promise.reject(error.response.data);
+//   }
+// );
 
 export default axiosInstance;
 

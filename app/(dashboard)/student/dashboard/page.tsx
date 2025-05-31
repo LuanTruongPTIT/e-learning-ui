@@ -23,6 +23,7 @@ import Link from "next/link";
 import { EnrolledCourse } from "@/apis/student-courses";
 import {
   getStudentDashboardData,
+  getUpcomingDeadlines,
   Deadline,
   ProgressData,
   StudyTimeData,
@@ -36,6 +37,7 @@ import { LearningActivityTimeline } from "@/components/dashboard/student/learnin
 import { RecentCourseCard } from "@/components/dashboard/student/recent-course-card";
 import { UpcomingDeadlineCard } from "@/components/dashboard/student/upcoming-deadline-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { NotificationList } from "@/components/notifications/NotificationList";
 
 // Mock data for enrolled courses (will be replaced with API data)
 const mockEnrolledCourses = [
@@ -215,72 +217,177 @@ export default function StudentDashboardPage() {
         setError(null);
 
         try {
+          // Fetch upcoming deadlines from real API
+          const deadlinesResponse = await getUpcomingDeadlines();
+          let realUpcomingDeadlines: Deadline[] = [];
+
+          if (deadlinesResponse.status === 200 && deadlinesResponse.data) {
+            realUpcomingDeadlines = deadlinesResponse.data.deadlines.map(
+              (deadline) => ({
+                id: deadline.id,
+                title: deadline.title,
+                course: deadline.course,
+                dueDate: deadline.dueDate,
+                type: deadline.type,
+                isNew: deadline.isNew,
+              })
+            );
+          }
+
           // In a production environment, use the real API call:
           const response = await getStudentDashboardData();
-          setDashboardData(response.data);
+          setDashboardData({
+            ...response.data,
+            upcomingDeadlines:
+              realUpcomingDeadlines.length > 0
+                ? realUpcomingDeadlines
+                : (mockUpcomingDeadlines as unknown as Deadline[]),
+          });
           setLoading(false);
         } catch (apiError) {
           console.error("Error fetching dashboard data from API:", apiError);
 
-          // Fallback to mock data if API call fails
-          setDashboardData({
-            stats: {
-              totalCourses: mockEnrolledCourses.length,
-              completedCourses: mockEnrolledCourses.filter(
-                (course) => course.status === "completed"
-              ).length,
-              inProgressCourses: mockEnrolledCourses.filter(
-                (course) => course.status === "in_progress"
-              ).length,
-              notStartedCourses: mockEnrolledCourses.filter(
-                (course) => course.status === "not_started"
-              ).length,
-              overallProgress: Math.round(
-                mockEnrolledCourses.reduce(
-                  (acc, course) => acc + course.progress,
-                  0
-                ) / mockEnrolledCourses.length
-              ),
-            },
-            recentCourses: mockEnrolledCourses
-              .filter((course) => course.last_accessed)
-              .sort((a, b) => {
-                if (!a.last_accessed) return 1;
-                if (!b.last_accessed) return -1;
-                return (
-                  new Date(b.last_accessed).getTime() -
-                  new Date(a.last_accessed).getTime()
-                );
-              })
-              .slice(0, 3) as unknown as EnrolledCourse[],
-            upcomingDeadlines: mockUpcomingDeadlines as unknown as Deadline[],
-            recentActivities: mockRecentActivities as unknown as ActivityType[],
-            progressData: [
-              { month: "Jan", progress: 10 },
-              { month: "Feb", progress: 25 },
-              { month: "Mar", progress: 30 },
-              { month: "Apr", progress: 45 },
-              { month: "May", progress: 60 },
-              { month: "Jun", progress: 75 },
-              { month: "Jul", progress: 85 },
-            ],
-            weeklyStudyData: [
-              { day: "Mon", hours: 2.5 },
-              { day: "Tue", hours: 1.8 },
-              { day: "Wed", hours: 3.2 },
-              { day: "Thu", hours: 2.0 },
-              { day: "Fri", hours: 1.5 },
-              { day: "Sat", hours: 4.0 },
-              { day: "Sun", hours: 3.5 },
-            ],
-            subjectDistribution: [
-              { name: "Web Development", value: 2, color: "#4f46e5" },
-              { name: "Programming", value: 1, color: "#10b981" },
-              { name: "Database", value: 1, color: "#f59e0b" },
-              { name: "Mobile Development", value: 1, color: "#ef4444" },
-              { name: "Computer Science", value: 1, color: "#8b5cf6" },
-            ],
-          });
+          // Try to fetch at least upcoming deadlines
+          try {
+            const deadlinesResponse = await getUpcomingDeadlines();
+            if (deadlinesResponse.status === 200 && deadlinesResponse.data) {
+              const realUpcomingDeadlines =
+                deadlinesResponse.data.deadlines.map((deadline) => ({
+                  id: deadline.id,
+                  title: deadline.title,
+                  course: deadline.course,
+                  dueDate: deadline.dueDate,
+                  type: deadline.type,
+                  isNew: deadline.isNew,
+                }));
+
+              // Fallback to mock data with real deadlines
+              setDashboardData({
+                stats: {
+                  totalCourses: mockEnrolledCourses.length,
+                  completedCourses: mockEnrolledCourses.filter(
+                    (course) => course.status === "completed"
+                  ).length,
+                  inProgressCourses: mockEnrolledCourses.filter(
+                    (course) => course.status === "in_progress"
+                  ).length,
+                  notStartedCourses: mockEnrolledCourses.filter(
+                    (course) => course.status === "not_started"
+                  ).length,
+                  overallProgress: Math.round(
+                    mockEnrolledCourses.reduce(
+                      (acc, course) => acc + course.progress,
+                      0
+                    ) / mockEnrolledCourses.length
+                  ),
+                },
+                recentCourses: mockEnrolledCourses
+                  .filter((course) => course.last_accessed)
+                  .sort((a, b) => {
+                    if (!a.last_accessed) return 1;
+                    if (!b.last_accessed) return -1;
+                    return (
+                      new Date(b.last_accessed).getTime() -
+                      new Date(a.last_accessed).getTime()
+                    );
+                  })
+                  .slice(0, 3) as unknown as EnrolledCourse[],
+                upcomingDeadlines: realUpcomingDeadlines,
+                recentActivities:
+                  mockRecentActivities as unknown as ActivityType[],
+                progressData: [
+                  { month: "Jan", progress: 10 },
+                  { month: "Feb", progress: 25 },
+                  { month: "Mar", progress: 30 },
+                  { month: "Apr", progress: 45 },
+                  { month: "May", progress: 60 },
+                  { month: "Jun", progress: 75 },
+                  { month: "Jul", progress: 85 },
+                ],
+                weeklyStudyData: [
+                  { day: "Mon", hours: 2.5 },
+                  { day: "Tue", hours: 1.8 },
+                  { day: "Wed", hours: 3.2 },
+                  { day: "Thu", hours: 2.0 },
+                  { day: "Fri", hours: 1.5 },
+                  { day: "Sat", hours: 4.0 },
+                  { day: "Sun", hours: 3.5 },
+                ],
+                subjectDistribution: [
+                  { name: "Web Development", value: 2, color: "#4f46e5" },
+                  { name: "Programming", value: 1, color: "#10b981" },
+                  { name: "Database", value: 1, color: "#f59e0b" },
+                  { name: "Mobile Development", value: 1, color: "#ef4444" },
+                  { name: "Computer Science", value: 1, color: "#8b5cf6" },
+                ],
+              });
+            } else {
+              throw new Error("Failed to fetch deadlines");
+            }
+          } catch (deadlineError) {
+            console.error("Error fetching deadlines:", deadlineError);
+
+            // Complete fallback to mock data
+            setDashboardData({
+              stats: {
+                totalCourses: mockEnrolledCourses.length,
+                completedCourses: mockEnrolledCourses.filter(
+                  (course) => course.status === "completed"
+                ).length,
+                inProgressCourses: mockEnrolledCourses.filter(
+                  (course) => course.status === "in_progress"
+                ).length,
+                notStartedCourses: mockEnrolledCourses.filter(
+                  (course) => course.status === "not_started"
+                ).length,
+                overallProgress: Math.round(
+                  mockEnrolledCourses.reduce(
+                    (acc, course) => acc + course.progress,
+                    0
+                  ) / mockEnrolledCourses.length
+                ),
+              },
+              recentCourses: mockEnrolledCourses
+                .filter((course) => course.last_accessed)
+                .sort((a, b) => {
+                  if (!a.last_accessed) return 1;
+                  if (!b.last_accessed) return -1;
+                  return (
+                    new Date(b.last_accessed).getTime() -
+                    new Date(a.last_accessed).getTime()
+                  );
+                })
+                .slice(0, 3) as unknown as EnrolledCourse[],
+              upcomingDeadlines: mockUpcomingDeadlines as unknown as Deadline[],
+              recentActivities:
+                mockRecentActivities as unknown as ActivityType[],
+              progressData: [
+                { month: "Jan", progress: 10 },
+                { month: "Feb", progress: 25 },
+                { month: "Mar", progress: 30 },
+                { month: "Apr", progress: 45 },
+                { month: "May", progress: 60 },
+                { month: "Jun", progress: 75 },
+                { month: "Jul", progress: 85 },
+              ],
+              weeklyStudyData: [
+                { day: "Mon", hours: 2.5 },
+                { day: "Tue", hours: 1.8 },
+                { day: "Wed", hours: 3.2 },
+                { day: "Thu", hours: 2.0 },
+                { day: "Fri", hours: 1.5 },
+                { day: "Sat", hours: 4.0 },
+                { day: "Sun", hours: 3.5 },
+              ],
+              subjectDistribution: [
+                { name: "Web Development", value: 2, color: "#4f46e5" },
+                { name: "Programming", value: 1, color: "#10b981" },
+                { name: "Database", value: 1, color: "#f59e0b" },
+                { name: "Mobile Development", value: 1, color: "#ef4444" },
+                { name: "Computer Science", value: 1, color: "#8b5cf6" },
+              ],
+            });
+          }
           setLoading(false);
         }
       } catch (error) {
@@ -406,6 +513,7 @@ export default function StudentDashboardPage() {
           <TabsTrigger value="progress">Learning Progress</TabsTrigger>
           <TabsTrigger value="activity">Recent Activity</TabsTrigger>
           <TabsTrigger value="deadlines">Upcoming Deadlines</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -634,6 +742,10 @@ export default function StudentDashboardPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="notifications" className="space-y-4">
+          <NotificationList />
         </TabsContent>
       </Tabs>
     </div>

@@ -1,11 +1,6 @@
 import axiosInstance, { endpoints } from "@/lib/axios";
 import { EnrolledCourse } from "./student-courses";
-
-export interface IApiResponse<T> {
-  status: number;
-  message: string;
-  data: T;
-}
+import { IApiResponse } from "@/interfaces/api-response";
 
 export interface DashboardStats {
   totalCourses: number;
@@ -46,6 +41,9 @@ export interface Deadline {
   course: string;
   dueDate: string;
   type: string;
+  isNew?: boolean;
+  maxScore?: number;
+  instructorId?: string;
 }
 
 export interface DashboardData {
@@ -59,22 +57,17 @@ export interface DashboardData {
 }
 
 // Get all dashboard data in one call
-export const getStudentDashboardData = async (): Promise<IApiResponse<DashboardData>> => {
-  try {
-    const result = await axiosInstance.get(
-      endpoints.student.get_dashboard_data,
-      {
-        withCredentials: true,
-      }
-    );
-    return result.data;
-  } catch (error) {
-    throw error;
-  }
+export const getStudentDashboardData = async (): Promise<
+  IApiResponse<DashboardData>
+> => {
+  const response = await axiosInstance.get("/program/student/dashboard");
+  return response.data;
 };
 
 // Get dashboard statistics
-export const getStudentDashboardStats = async (): Promise<IApiResponse<DashboardStats>> => {
+export const getStudentDashboardStats = async (): Promise<
+  IApiResponse<DashboardStats>
+> => {
   try {
     const result = await axiosInstance.get(
       endpoints.student.get_dashboard_stats,
@@ -89,7 +82,9 @@ export const getStudentDashboardStats = async (): Promise<IApiResponse<Dashboard
 };
 
 // Get recent courses
-export const getRecentCourses = async (): Promise<IApiResponse<EnrolledCourse[]>> => {
+export const getRecentCourses = async (): Promise<
+  IApiResponse<EnrolledCourse[]>
+> => {
   try {
     const result = await axiosInstance.get(
       endpoints.student.get_recent_courses,
@@ -104,22 +99,19 @@ export const getRecentCourses = async (): Promise<IApiResponse<EnrolledCourse[]>
 };
 
 // Get upcoming deadlines
-export const getUpcomingDeadlines = async (): Promise<IApiResponse<Deadline[]>> => {
-  try {
-    const result = await axiosInstance.get(
-      endpoints.student.get_upcoming_deadlines,
-      {
-        withCredentials: true,
-      }
-    );
-    return result.data;
-  } catch (error) {
-    throw error;
-  }
+export const getUpcomingDeadlines = async (): Promise<
+  IApiResponse<{ deadlines: Deadline[] }>
+> => {
+  const response = await axiosInstance.get(
+    "/program/student/dashboard/deadlines"
+  );
+  return response.data;
 };
 
 // Get recent activities
-export const getRecentActivities = async (): Promise<IApiResponse<Activity[]>> => {
+export const getRecentActivities = async (): Promise<
+  IApiResponse<Activity[]>
+> => {
   try {
     const result = await axiosInstance.get(
       endpoints.student.get_recent_activities,
@@ -134,7 +126,9 @@ export const getRecentActivities = async (): Promise<IApiResponse<Activity[]>> =
 };
 
 // Get progress data for chart
-export const getProgressData = async (): Promise<IApiResponse<ProgressData[]>> => {
+export const getProgressData = async (): Promise<
+  IApiResponse<ProgressData[]>
+> => {
   try {
     const result = await axiosInstance.get(
       endpoints.student.get_progress_data,
@@ -149,7 +143,9 @@ export const getProgressData = async (): Promise<IApiResponse<ProgressData[]>> =
 };
 
 // Get weekly study data for chart
-export const getWeeklyStudyData = async (): Promise<IApiResponse<StudyTimeData[]>> => {
+export const getWeeklyStudyData = async (): Promise<
+  IApiResponse<StudyTimeData[]>
+> => {
   try {
     const result = await axiosInstance.get(
       endpoints.student.get_weekly_study_data,
@@ -164,7 +160,9 @@ export const getWeeklyStudyData = async (): Promise<IApiResponse<StudyTimeData[]
 };
 
 // Get subject distribution data for chart
-export const getSubjectDistribution = async (): Promise<IApiResponse<SubjectDistribution[]>> => {
+export const getSubjectDistribution = async (): Promise<
+  IApiResponse<SubjectDistribution[]>
+> => {
   try {
     const result = await axiosInstance.get(
       endpoints.student.get_subject_distribution,

@@ -26,6 +26,7 @@ import { format } from "date-fns";
 import CourseMaterials from "./course-materials";
 import CourseStudents from "./course-students";
 import CourseInformation from "./course-information";
+import CourseAssignments from "./course-assignments";
 import { TeachingAssignCourseResponse } from "@/apis/teacher";
 
 interface CourseDetailViewProps {
@@ -146,7 +147,7 @@ CourseDetailViewProps) {
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="grid w-full grid-cols-4 md:w-auto bg-secondary">
+        <TabsList className="grid w-full grid-cols-5 md:w-auto bg-secondary">
           <TabsTrigger
             value="materials"
             className="flex items-center gap-2 data-[state=active]:bg-white"
@@ -155,10 +156,17 @@ CourseDetailViewProps) {
             <span className="hidden sm:inline">Materials</span>
           </TabsTrigger>
           <TabsTrigger
-            value="teaching-plans"
+            value="assignments"
             className="flex items-center gap-2 data-[state=active]:bg-white"
           >
             <BookOpen className="h-4 w-4" />
+            <span className="hidden sm:inline">Assignments</span>
+          </TabsTrigger>
+          <TabsTrigger
+            value="teaching-plans"
+            className="flex items-center gap-2 data-[state=active]:bg-white"
+          >
+            <Calendar className="h-4 w-4" />
             <span className="hidden sm:inline">Teaching Plans</span>
           </TabsTrigger>
           <TabsTrigger
@@ -182,8 +190,8 @@ CourseDetailViewProps) {
             <CardHeader className="bg-secondary/50 rounded-t-lg">
               <CardTitle>Course Materials</CardTitle>
               <CardDescription>
-                Upload and manage lecture documents, assignments, and other
-                course materials.
+                Upload and manage lecture documents, videos, and other course
+                materials.
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
@@ -192,6 +200,21 @@ CourseDetailViewProps) {
                 // materials={course.lectures}
                 // onMaterialsChange={handleMaterialsUpdate}
               />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="assignments" className="space-y-4">
+          <Card className="border-none shadow-sm">
+            <CardHeader className="bg-secondary/50 rounded-t-lg">
+              <CardTitle>Course Assignments</CardTitle>
+              <CardDescription>
+                Create and manage assignments, quizzes, and homework for your
+                students.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <CourseAssignments courseId={course.id} />
             </CardContent>
           </Card>
         </TabsContent>

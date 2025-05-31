@@ -270,6 +270,66 @@
 @layer components {
   .required:after {
     content: " *";
-    color: hsl(var(--destructive));
+    color: red;
+  }
+
+  /* Toast Custom Styles */
+  .Toastify__toast-container {
+    z-index: 99999 !important;
+    position: fixed !important;
+    pointer-events: auto !important;
+    isolation: isolate !important;
+  }
+
+  .Toastify__toast {
+    opacity: 1 !important;
+    background-color: white !important;
+    color: black !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 8px !important;
+    z-index: 99999 !important;
+    position: relative !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  .Toastify__toast--success {
+    background-color: #10b981 !important;
+    color: white !important;
+  }
+
+  .Toastify__toast--error {
+    background-color: #ef4444 !important;
+    color: white !important;
+  }
+
+  .Toastify__toast--info {
+    background-color: #3b82f6 !important;
+    color: white !important;
+  }
+
+  .Toastify__toast--warning {
+    background-color: #f59e0b !important;
+    color: white !important;
+  }
+
+  .Toastify__progress-bar {
+    background: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  .Toastify__close-button {
+    color: white !important;
+    opacity: 0.8 !important;
+  }
+
+  .Toastify__close-button:hover {
+    opacity: 1 !important;
+  }
+
+  /* Ensure toast is not affected by any parent backdrop effects */
+  .Toastify__toast-container * {
+    backdrop-filter: none !important;
+    filter: none !important;
   }
 }

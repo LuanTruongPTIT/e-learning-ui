@@ -21,7 +21,25 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className}`}>
         <AppProviders>{children}</AppProviders>
-        <ToastContainer position="bottom-right" theme="auto" />
+        <ToastContainer
+          position="bottom-right"
+          theme="auto"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          style={{ zIndex: 99999 }}
+          toastStyle={{
+            backgroundColor: "white",
+            color: "black",
+            opacity: 1,
+            zIndex: 99999,
+          }}
+        />
       </body>
     </html>
   );
