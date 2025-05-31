@@ -132,6 +132,29 @@ export const assignmentApi = {
     );
     return response.data;
   },
+
+  // Student APIs
+  // Get Assignment Details for Student
+  getAssignmentDetailsForStudent: async (
+    assignmentId: string
+  ): Promise<IApiResponse<StudentAssignmentDetails>> => {
+    const response = await axiosInstance.get(
+      `/student/assignments/${assignmentId}`
+    );
+    return response.data;
+  },
+
+  // Submit Assignment
+  submitAssignment: async (
+    assignmentId: string,
+    data: SubmitAssignmentRequest
+  ): Promise<IApiResponse<SubmitAssignmentResponse>> => {
+    const response = await axiosInstance.post(
+      `/student/assignments/${assignmentId}/submit`,
+      data
+    );
+    return response.data;
+  },
 };
 
 // Recent Activities API Functions
@@ -227,3 +250,72 @@ export const TargetTypes = {
   COURSE: "course",
   NOTIFICATION: "notification",
 } as const;
+
+// Student Assignment Types
+export interface StudentAssignmentDetails {
+  id: string;
+  title: string;
+  description: string;
+  deadline: string;
+  assignmentType: string;
+  showAnswers: boolean;
+  timeLimitMinutes?: number;
+  attachmentUrls?: string[];
+  maxScore: number;
+  isPublished: boolean;
+  createdAt: string;
+  courseName: string;
+  teacherName: string;
+  hasSubmission: boolean;
+  submission?: AssignmentSubmissionInfo;
+}
+
+export interface AssignmentSubmissionInfo {
+  id: string;
+  submissionType: string;
+  fileUrls?: string[];
+  submittedAt: string;
+  grade?: number;
+  feedback?: string;
+  status: string;
+}
+
+export interface SubmitAssignmentRequest {
+  submissionType: string;
+  fileUrls?: string[];
+  textContent?: string;
+  quizAnswers?: Record<string, unknown>;
+}
+
+export interface SubmitAssignmentResponse {
+  submission_id: string;
+  submitted_at: string;
+}
+
+// Download assignment attachment file
+export const downloadAssignmentFile = async (
+  assignmentId: string,
+  fileUrl: string
+): Promise<Blob> => {
+  const response = await axiosInstance.get(
+    `/student/assignments/${assignmentId}/download`,
+    {
+      params: { fileUrl },
+      responseType: "blob",
+    }
+  );
+
+  return response.data;
+};
+
+// Helper function to trigger file download in browser
+export const triggerFileDownload = (blob: Blob, fileName: string) => {
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};

@@ -14,6 +14,7 @@ import {
   Filter,
 } from "lucide-react";
 import { NotificationCard } from "@/components/dashboard/student/notification-card";
+import { AssignmentView } from "@/components/student/AssignmentView";
 import {
   studentNotificationsApi,
   StudentNotification,
@@ -26,6 +27,9 @@ export function NotificationList() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState<
+    string | null
+  >(null);
   const [pagination, setPagination] = useState({
     pageNumber: 1,
     pageSize: 20,
@@ -128,9 +132,12 @@ export function NotificationList() {
 
   // Navigate to assignment
   const handleNavigateToAssignment = (assignmentId: string) => {
-    // TODO: Implement navigation to assignment detail page
-    console.log("Navigate to assignment:", assignmentId);
-    toast.info("Chức năng xem bài tập sẽ được triển khai sau");
+    setSelectedAssignmentId(assignmentId);
+  };
+
+  // Back to notifications
+  const handleBackToNotifications = () => {
+    setSelectedAssignmentId(null);
   };
 
   // Handle tab change
@@ -157,6 +164,16 @@ export function NotificationList() {
   const filteredNotifications = getFilteredNotifications();
   const unreadCount = notifications.filter((n) => !n.isRead).length;
   const newCount = notifications.filter((n) => n.isNew).length;
+
+  // If viewing an assignment, show the assignment view
+  if (selectedAssignmentId) {
+    return (
+      <AssignmentView
+        assignmentId={selectedAssignmentId}
+        onBack={handleBackToNotifications}
+      />
+    );
+  }
 
   if (loading && notifications.length === 0) {
     return (
