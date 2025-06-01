@@ -32,6 +32,40 @@ export interface Assignment {
   totalStudents?: number;
 }
 
+// Teacher Assignment Details Types
+export interface TeacherAssignmentDetails {
+  id: string;
+  title: string;
+  description: string;
+  deadline: string;
+  assignmentType: string;
+  showAnswers: boolean;
+  timeLimitMinutes?: number;
+  attachmentUrls?: string[];
+  maxScore: number;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+  courseName: string;
+  className: string;
+  totalStudents: number;
+  submissionsCount: number;
+  gradedSubmissions: number;
+  pendingSubmissions: number;
+  averageGrade?: number;
+  recentSubmissions: RecentSubmissionInfo[];
+}
+
+export interface RecentSubmissionInfo {
+  id: string;
+  studentName: string;
+  studentEmail: string;
+  submittedAt: string;
+  grade?: number;
+  status: string;
+  isLate: boolean;
+}
+
 export interface CreateAssignmentRequest {
   course_id: string;
   title: string;
@@ -120,6 +154,16 @@ export const assignmentApi = {
   ): Promise<IApiResponse<Assignment>> => {
     const response = await axiosInstance.get(
       `/program/assignments/${assignmentId}`
+    );
+    return response.data;
+  },
+
+  // Get Assignment Details for Teacher
+  getAssignmentDetailsForTeacher: async (
+    assignmentId: string
+  ): Promise<IApiResponse<TeacherAssignmentDetails>> => {
+    const response = await axiosInstance.get(
+      `/teacher/assignments/${assignmentId}/details`
     );
     return response.data;
   },

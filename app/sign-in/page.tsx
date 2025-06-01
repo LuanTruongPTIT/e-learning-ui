@@ -44,7 +44,7 @@ export default function LoginPage() {
         } else if (result.data.role == "Teacher") {
           router.push("/teacher");
         } else if (result.data.role == "Student") {
-          router.push("/student");
+          router.push("/student/dashboard");
         }
       }
     } catch (err: any) {

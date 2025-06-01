@@ -33,7 +33,6 @@ import {
   Trash2,
   Eye,
   Users,
-  // Calendar,
   Clock,
   FileText,
   ArrowUpDown,
@@ -149,7 +148,7 @@ export default function CourseAssignments({
 
     return (
       <Badge variant={isExpired ? "destructive" : "default"}>
-        {isExpired ? "Đã hết hạn" : "Đang mở"}
+        {isExpired ? "Expired" : "Active"}
       </Badge>
     );
   };
@@ -168,21 +167,29 @@ export default function CourseAssignments({
   };
 
   const handleDelete = async (assignmentId: string) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa bài tập này?")) {
+    if (window.confirm("Are you sure you want to delete this assignment?")) {
       try {
         const response = await assignmentApi.deleteAssignment(assignmentId);
 
         if (response.status === 200) {
-          toast.success("Đã xóa bài tập thành công");
+          toast.success("Assignment deleted successfully");
           fetchAssignments(); // Refresh list
         } else {
-          toast.error("Có lỗi xảy ra khi xóa bài tập");
+          toast.error("Failed to delete assignment");
         }
       } catch (error) {
         console.error("Error deleting assignment:", error);
-        toast.error("Có lỗi xảy ra khi xóa bài tập");
+        toast.error("Failed to delete assignment");
       }
     }
+  };
+
+  const handleViewDetails = (assignmentId: string) => {
+    router.push(`/teacher/assignments/${assignmentId}/details`);
+  };
+
+  const handleViewSubmissions = (assignmentId: string) => {
+    router.push(`/teacher/assignments/${assignmentId}/grading`);
   };
 
   const handleGradeAssignment = (assignmentId: string) => {
@@ -213,7 +220,7 @@ export default function CourseAssignments({
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Tìm kiếm bài tập..."
+            placeholder="Search assignments..."
             className="pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -223,24 +230,24 @@ export default function CourseAssignments({
         <div className="flex gap-2">
           <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Trạng thái" />
+              <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
-              <SelectItem value="active">Đang mở</SelectItem>
-              <SelectItem value="expired">Đã hết hạn</SelectItem>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="expired">Expired</SelectItem>
             </SelectContent>
           </Select>
 
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Sắp xếp" />
+              <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="deadline">Deadline</SelectItem>
-              <SelectItem value="title">Tiêu đề</SelectItem>
-              <SelectItem value="created_at">Ngày tạo</SelectItem>
-              <SelectItem value="submissions">Số bài nộp</SelectItem>
+              <SelectItem value="title">Title</SelectItem>
+              <SelectItem value="created_at">Created Date</SelectItem>
+              <SelectItem value="submissions">Submissions</SelectItem>
             </SelectContent>
           </Select>
 
@@ -254,7 +261,7 @@ export default function CourseAssignments({
 
           <Button onClick={() => setIsCreateModalOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Tạo bài tập
+            Create Assignment
           </Button>
         </div>
       </div>
@@ -271,11 +278,11 @@ export default function CourseAssignments({
                     className="p-0 font-medium"
                     onClick={() => toggleSort("title")}
                   >
-                    Tiêu đề
+                    Title
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                   </Button>
                 </TableHead>
-                <TableHead className="w-[15%]">Loại</TableHead>
+                <TableHead className="w-[15%]">Type</TableHead>
                 <TableHead className="w-[20%]">
                   <Button
                     variant="ghost"
@@ -292,12 +299,12 @@ export default function CourseAssignments({
                     className="p-0 font-medium"
                     onClick={() => toggleSort("submissions")}
                   >
-                    Nộp bài
+                    Submissions
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                   </Button>
                 </TableHead>
-                <TableHead className="w-[10%]">Trạng thái</TableHead>
-                <TableHead className="text-right w-[10%]">Thao tác</TableHead>
+                <TableHead className="w-[10%]">Status</TableHead>
+                <TableHead className="text-right w-[10%]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -330,7 +337,7 @@ export default function CourseAssignments({
                           <Clock className="h-3 w-3" />
                           {assignment.timeLimitMinutes ||
                             assignment.time_limit_minutes}{" "}
-                          phút
+                          minutes
                         </div>
                       )}
                     </div>
@@ -338,11 +345,12 @@ export default function CourseAssignments({
                   <TableCell>
                     <div className="text-sm">
                       {(assignment.assignmentType ||
-                        assignment.assignment_type) === "quiz" && "Quiz online"}
+                        assignment.assignment_type) === "quiz" && "Online Quiz"}
                       {(assignment.assignmentType ||
-                        assignment.assignment_type) === "upload" && "Nộp file"}
+                        assignment.assignment_type) === "upload" &&
+                        "File Upload"}
                       {(assignment.assignmentType ||
-                        assignment.assignment_type) === "both" && "Cả hai"}
+                        assignment.assignment_type) === "both" && "Both"}
                     </div>
                     {(assignment.attachmentUrls ||
                       assignment.attachment_urls) &&
@@ -354,7 +362,7 @@ export default function CourseAssignments({
                             (assignment.attachmentUrls ||
                               assignment.attachment_urls)!.length
                           }{" "}
-                          file
+                          file(s)
                         </div>
                       )}
                   </TableCell>
@@ -387,7 +395,7 @@ export default function CourseAssignments({
                       (assignment.totalStudents ??
                         assignment.total_students ??
                         0)
-                        ? "Hoàn thành"
+                        ? "Complete"
                         : `${
                             (assignment.totalStudents ??
                               assignment.total_students ??
@@ -395,7 +403,7 @@ export default function CourseAssignments({
                             (assignment.submissionsCount ??
                               assignment.submissions_count ??
                               0)
-                          } chưa nộp`}
+                          } pending`}
                     </div>
                   </TableCell>
                   <TableCell>{getStatusBadge(assignment.deadline)}</TableCell>
@@ -407,31 +415,37 @@ export default function CourseAssignments({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => handleViewDetails(assignment.id)}
+                        >
                           <Eye className="mr-2 h-4 w-4" />
-                          Xem chi tiết
+                          View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => handleViewSubmissions(assignment.id)}
+                        >
                           <Users className="mr-2 h-4 w-4" />
-                          Xem bài nộp
+                          View Submissions
                         </DropdownMenuItem>
                         <DropdownMenuItem className="cursor-pointer">
                           <Edit className="mr-2 h-4 w-4" />
-                          Chỉnh sửa
+                          Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="cursor-pointer text-destructive focus:text-destructive"
                           onClick={() => handleDelete(assignment.id)}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Xóa
+                          Delete
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="cursor-pointer"
                           onClick={() => handleGradeAssignment(assignment.id)}
                         >
                           <GraduationCap className="mr-2 h-4 w-4" />
-                          Chấm điểm
+                          Grade
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -444,16 +458,16 @@ export default function CourseAssignments({
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center border rounded-md bg-muted/20">
           <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium">Chưa có bài tập nào</h3>
+          <h3 className="text-lg font-medium">No assignments yet</h3>
           <p className="text-muted-foreground mt-1 mb-4">
             {searchQuery || filterStatus !== "all"
-              ? "Không tìm thấy bài tập phù hợp với bộ lọc."
-              : "Tạo bài tập đầu tiên cho khóa học này."}
+              ? "No assignments match your filters."
+              : "Create your first assignment for this course."}
           </p>
           {!searchQuery && filterStatus === "all" && (
             <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Tạo bài tập đầu tiên
+              Create First Assignment
             </Button>
           )}
         </div>

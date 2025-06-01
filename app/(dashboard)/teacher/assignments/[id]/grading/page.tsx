@@ -75,7 +75,7 @@ export default function AssignmentGradingPage() {
   const [grading, setGrading] = useState(false);
 
   // Filter and pagination states
-  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
 
@@ -99,7 +99,7 @@ export default function AssignmentGradingPage() {
     try {
       setLoading(true);
       const response = await getAssignmentSubmissions(assignmentId, {
-        status: statusFilter || undefined,
+        status: statusFilter === "all" ? undefined : statusFilter,
         page: currentPage,
         pageSize: pageSize,
       });
@@ -305,7 +305,7 @@ export default function AssignmentGradingPage() {
                   <SelectValue placeholder="Lọc theo trạng thái" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Tất cả</SelectItem>
+                  <SelectItem value="all">Tất cả</SelectItem>
                   <SelectItem value="submitted">Chờ chấm</SelectItem>
                   <SelectItem value="graded">Đã chấm</SelectItem>
                 </SelectContent>
