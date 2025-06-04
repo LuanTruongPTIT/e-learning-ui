@@ -1,0 +1,589 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import {
+  BookOpen,
+  CheckCircle,
+  Clock,
+  Activity,
+  Loader2,
+  AlertCircle,
+  TrendingUp,
+  Target,
+  Calendar,
+  BarChart3,
+  PlayCircle,
+  Award,
+  Users,
+  Brain,
+} from "lucide-react";
+import Link from "next/link";
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+
+// Interfaces
+interface StudentStats {
+  totalCourses: number;
+  completedCourses: number;
+  inProgressCourses: number;
+  notStartedCourses: number;
+  overallProgress: number;
+}
+
+interface CourseProgress {
+  courseId: string;
+  courseName: string;
+  progress: number;
+  status: string;
+  lastAccessed: string;
+  instructor: string;
+  totalLectures: number;
+  completedLectures: number;
+  category: string;
+}
+
+interface UpcomingDeadline {
+  id: string;
+  title: string;
+  courseName: string;
+  dueDate: string;
+  type: "assignment" | "quiz" | "project" | "exam";
+  priority: "high" | "medium" | "low";
+}
+
+interface RecentActivity {
+  id: string;
+  type:
+    | "lecture_completed"
+    | "assignment_submitted"
+    | "quiz_completed"
+    | "course_started";
+  description: string;
+  courseName: string;
+  timestamp: string;
+  score?: number;
+}
+
+interface StudyStreak {
+  currentStreak: number;
+  longestStreak: number;
+  totalStudyDays: number;
+}
+
+const StudentDashboardImproved = () => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<StudentStats | null>(null);
+  const [courseProgress, setCourseProgress] = useState<CourseProgress[]>([]);
+  const [upcomingDeadlines, setUpcomingDeadlines] = useState<
+    UpcomingDeadline[]
+  >([]);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>(
+    []
+  );
+  const [studyStreak, setStudyStreak] = useState<StudyStreak | null>(null);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+
+      // Mock data - replace with actual API calls
+      setTimeout(() => {
+        setStats({
+          totalCourses: 8,
+          completedCourses: 3,
+          inProgressCourses: 4,
+          notStartedCourses: 1,
+          overallProgress: 65,
+        });
+
+        setCourseProgress([
+          {
+            courseId: "c1",
+            courseName: "Nhập môn lập trình",
+            progress: 85,
+            status: "in_progress",
+            lastAccessed: "2024-06-02T10:30:00",
+            instructor: "TS. Nguyễn Văn A",
+            totalLectures: 20,
+            completedLectures: 17,
+            category: "Lập trình",
+          },
+          {
+            courseId: "c2",
+            courseName: "Cấu trúc dữ liệu",
+            progress: 60,
+            status: "in_progress",
+            lastAccessed: "2024-06-01T14:20:00",
+            instructor: "ThS. Trần Thị B",
+            totalLectures: 18,
+            completedLectures: 11,
+            category: "Khoa học máy tính",
+          },
+          {
+            courseId: "c3",
+            courseName: "Web Development",
+            progress: 100,
+            status: "completed",
+            lastAccessed: "2024-05-30T16:45:00",
+            instructor: "CN. Lê Văn C",
+            totalLectures: 15,
+            completedLectures: 15,
+            category: "Phát triển web",
+          },
+        ]);
+
+        setUpcomingDeadlines([
+          {
+            id: "d1",
+            title: "Bài tập lớn: Quản lý thư viện",
+            courseName: "Nhập môn lập trình",
+            dueDate: "2024-06-10T23:59:00",
+            type: "assignment",
+            priority: "high",
+          },
+          {
+            id: "d2",
+            title: "Kiểm tra giữa kỳ",
+            courseName: "Cấu trúc dữ liệu",
+            dueDate: "2024-06-15T14:00:00",
+            type: "exam",
+            priority: "high",
+          },
+          {
+            id: "d3",
+            title: "Quiz: Array và Linked List",
+            courseName: "Cấu trúc dữ liệu",
+            dueDate: "2024-06-08T17:00:00",
+            type: "quiz",
+            priority: "medium",
+          },
+        ]);
+
+        setRecentActivities([
+          {
+            id: "a1",
+            type: "lecture_completed",
+            description: "Hoàn thành bài giảng: Mảng và con trỏ",
+            courseName: "Nhập môn lập trình",
+            timestamp: "2024-06-02T10:30:00",
+          },
+          {
+            id: "a2",
+            type: "assignment_submitted",
+            description: "Nộp bài tập: Thuật toán sắp xếp",
+            courseName: "Cấu trúc dữ liệu",
+            timestamp: "2024-06-01T20:15:00",
+          },
+          {
+            id: "a3",
+            type: "quiz_completed",
+            description: "Hoàn thành quiz: HTML & CSS cơ bản",
+            courseName: "Web Development",
+            timestamp: "2024-05-30T16:45:00",
+            score: 92,
+          },
+        ]);
+
+        setStudyStreak({
+          currentStreak: 7,
+          longestStreak: 12,
+          totalStudyDays: 45,
+        });
+
+        setLoading(false);
+      }, 1000);
+    } catch (err) {
+      setError("Không thể tải dữ liệu dashboard");
+      setLoading(false);
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "text-green-600 bg-green-50";
+      case "in_progress":
+        return "text-blue-600 bg-blue-50";
+      case "not_started":
+        return "text-gray-600 bg-gray-50";
+      default:
+        return "text-gray-600 bg-gray-50";
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "text-red-600 bg-red-50";
+      case "medium":
+        return "text-yellow-600 bg-yellow-50";
+      case "low":
+        return "text-green-600 bg-green-50";
+      default:
+        return "text-gray-600 bg-gray-50";
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "assignment":
+        return <BookOpen className="h-4 w-4" />;
+      case "quiz":
+        return <Brain className="h-4 w-4" />;
+      case "exam":
+        return <AlertCircle className="h-4 w-4" />;
+      case "project":
+        return <Target className="h-4 w-4" />;
+      default:
+        return <BookOpen className="h-4 w-4" />;
+    }
+  };
+
+  const formatTimeRemaining = (dueDate: string) => {
+    const now = new Date();
+    const due = new Date(dueDate);
+    const diffTime = due.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return "Đã quá hạn";
+    if (diffDays === 0) return "Hôm nay";
+    if (diffDays === 1) return "Ngày mai";
+    return `${diffDays} ngày nữa`;
+  };
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
+          <span className="ml-2">Đang tải dashboard...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="text-center py-12">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Có lỗi xảy ra
+          </h3>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Button onClick={fetchDashboardData}>Thử lại</Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Dashboard Học tập
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Theo dõi tiến độ học tập và thành tích của bạn
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button asChild variant="outline">
+            <Link href="/student/courses">
+              <BookOpen className="h-4 w-4 mr-2" />
+              Xem tất cả khóa học
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Tổng khóa học
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats?.totalCourses}
+                </p>
+                <p className="text-xs text-blue-600 mt-1">
+                  {stats?.inProgressCourses} đang học
+                </p>
+              </div>
+              <div className="h-12 w-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                <BookOpen className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Hoàn thành</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {stats?.completedCourses}
+                </p>
+                <p className="text-xs text-green-600 mt-1">
+                  <TrendingUp className="inline h-3 w-3 mr-1" />
+                  Tuyệt vời!
+                </p>
+              </div>
+              <div className="h-12 w-12 bg-green-50 rounded-lg flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Tiến độ tổng
+                </p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {stats?.overallProgress}%
+                </p>
+                <Progress value={stats?.overallProgress} className="h-2 mt-2" />
+              </div>
+              <div className="h-12 w-12 bg-purple-50 rounded-lg flex items-center justify-center">
+                <BarChart3 className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Chuỗi học tập
+                </p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {studyStreak?.currentStreak}
+                </p>
+                <p className="text-xs text-orange-600 mt-1">
+                  Kỷ lục: {studyStreak?.longestStreak} ngày
+                </p>
+              </div>
+              <div className="h-12 w-12 bg-orange-50 rounded-lg flex items-center justify-center">
+                <Award className="h-6 w-6 text-orange-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Course Progress */}
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Tiến độ khóa học
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {courseProgress.map((course) => (
+                  <div
+                    key={course.courseId}
+                    className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900">
+                          {course.courseName}
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          Giảng viên: {course.instructor}
+                        </p>
+                        <Badge
+                          variant="outline"
+                          className={`mt-2 ${getStatusColor(course.status)}`}
+                        >
+                          {course.status === "completed"
+                            ? "Hoàn thành"
+                            : course.status === "in_progress"
+                            ? "Đang học"
+                            : "Chưa bắt đầu"}
+                        </Badge>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-blue-600">
+                          {Math.round(course.progress)}%
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          {course.completedLectures}/{course.totalLectures} bài
+                          giảng
+                        </p>
+                      </div>
+                    </div>
+
+                    <Progress value={course.progress} className="h-2 mb-3" />
+
+                    <div className="flex items-center justify-between text-sm text-gray-600">
+                      <span>Danh mục: {course.category}</span>
+                      <span>
+                        Truy cập:{" "}
+                        {new Date(course.lastAccessed).toLocaleDateString(
+                          "vi-VN"
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-2 mt-3">
+                      <Button asChild size="sm" className="flex-1">
+                        <Link href={`/student/courses/${course.courseId}`}>
+                          <PlayCircle className="h-4 w-4 mr-2" />
+                          Tiếp tục học
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" size="sm">
+                        <Link
+                          href={`/student/courses/${course.courseId}/progress`}
+                        >
+                          <BarChart3 className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Upcoming Deadlines */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                Deadline sắp tới
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {upcomingDeadlines.map((deadline) => (
+                  <div key={deadline.id} className="p-3 border rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`p-2 rounded-lg ${getPriorityColor(
+                          deadline.priority
+                        )}`}
+                      >
+                        {getTypeIcon(deadline.type)}
+                      </div>
+                      <div className="flex-1">
+                        <h5 className="font-medium text-sm text-gray-900">
+                          {deadline.title}
+                        </h5>
+                        <p className="text-xs text-gray-600">
+                          {deadline.courseName}
+                        </p>
+                        <div className="flex items-center justify-between mt-2">
+                          <Badge
+                            variant="outline"
+                            className={getPriorityColor(deadline.priority)}
+                          >
+                            {deadline.priority === "high"
+                              ? "Cao"
+                              : deadline.priority === "medium"
+                              ? "Trung bình"
+                              : "Thấp"}
+                          </Badge>
+                          <span className="text-xs text-gray-600">
+                            {formatTimeRemaining(deadline.dueDate)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Activities */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                Hoạt động gần đây
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {recentActivities.map((activity) => (
+                  <div key={activity.id} className="flex items-start gap-3">
+                    <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mt-1">
+                      <Activity className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {activity.description}
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        {activity.courseName}
+                      </p>
+                      {activity.score && (
+                        <p className="text-xs text-green-600 font-medium">
+                          Điểm: {activity.score}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(activity.timestamp).toLocaleString("vi-VN")}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default StudentDashboardImproved;

@@ -60,7 +60,9 @@ export interface DashboardData {
 export const getStudentDashboardData = async (): Promise<
   IApiResponse<DashboardData>
 > => {
-  const response = await axiosInstance.get("/program/student/dashboard");
+  const response = await axiosInstance.get(
+    endpoints.student.get_dashboard_data
+  );
   return response.data;
 };
 
@@ -83,7 +85,7 @@ export const getStudentDashboardStats = async (): Promise<
 
 // Get recent courses
 export const getRecentCourses = async (): Promise<
-  IApiResponse<EnrolledCourse[]>
+  IApiResponse<{ courses: EnrolledCourse[] }>
 > => {
   try {
     const result = await axiosInstance.get(
@@ -103,7 +105,7 @@ export const getUpcomingDeadlines = async (): Promise<
   IApiResponse<{ deadlines: Deadline[] }>
 > => {
   const response = await axiosInstance.get(
-    "/program/student/dashboard/deadlines"
+    endpoints.student.get_upcoming_deadlines
   );
   return response.data;
 };

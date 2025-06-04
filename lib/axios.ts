@@ -69,6 +69,18 @@ export const endpoints = {
   teacher: {
     create_teacher: `users/create-teacher`,
     get_teacher_by_admin: `users/teachers`,
+    // Class monitoring endpoints
+    get_teacher_classes: `program/teacher/classes`,
+    get_class_overview: (classId: string) =>
+      `program/teacher/class/${classId}/overview`,
+    get_class_students: (classId: string) =>
+      `program/teacher/class/${classId}/students`,
+    get_student_detail: (studentId: string) =>
+      `program/teacher/students/${studentId}`,
+    export_class_report: (classId: string) =>
+      `program/teacher/class/${classId}/export`,
+    send_message_to_student: (studentId: string) =>
+      `program/teacher/students/${studentId}/message`,
   },
   department: {
     get_departments: `program/department`,
@@ -111,14 +123,14 @@ export const endpoints = {
     update_lecture_progress: (lectureId: string) =>
       `student/lectures/${lectureId}/progress`,
     // Dashboard endpoints
-    get_dashboard_data: `student/dashboard`,
-    get_dashboard_stats: `student/dashboard/stats`,
-    get_recent_courses: `student/dashboard/recent-courses`,
-    get_upcoming_deadlines: `student/dashboard/deadlines`,
-    get_recent_activities: `student/dashboard/activities`,
-    get_progress_data: `student/dashboard/progress`,
-    get_weekly_study_data: `student/dashboard/weekly-study`,
-    get_subject_distribution: `student/dashboard/subjects`,
+    get_dashboard_data: `program/student/dashboard`,
+    get_dashboard_stats: `program/student/dashboard/stats`,
+    get_recent_courses: `program/student/dashboard/recent-courses`,
+    get_upcoming_deadlines: `program/student/dashboard/deadlines`,
+    get_recent_activities: `program/student/dashboard/activities`,
+    get_progress_data: `program/student/dashboard/progress`,
+    get_weekly_study_data: `program/student/dashboard/weekly-study`,
+    get_subject_distribution: `program/student/dashboard/subjects`,
   },
   profile: {
     get_current_user: `users/me`,
