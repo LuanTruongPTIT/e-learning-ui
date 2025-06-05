@@ -81,6 +81,8 @@ export const endpoints = {
       `program/teacher/class/${classId}/export`,
     send_message_to_student: (studentId: string) =>
       `program/teacher/students/${studentId}/message`,
+    // Dashboard endpoints
+    get_teacher_dashboard: `program/teacher/dashboard`,
   },
   department: {
     get_departments: `program/department`,
