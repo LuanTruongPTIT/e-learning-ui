@@ -4,6 +4,7 @@ import Link from "next/link";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
 const menuItems = [
   {
     title: "MENU",
@@ -24,7 +25,7 @@ const menuItems = [
         icon: "/student.png",
         label: "Students",
         href: "/list/students",
-        visible: ["Administrator", "Teacher"],
+        visible: ["Administrator"],
       },
       {
         icon: "/subject.png",
@@ -35,7 +36,8 @@ const menuItems = [
       {
         icon: "/class.png",
         label: "Classes",
-        href: "/list/room",
+        href: "/list/room", // Default for Administrator
+        teacherHref: "/teacher/classes", // Special href for Teacher
         visible: ["Administrator", "Teacher"],
       },
       {
@@ -94,17 +96,19 @@ const menuItems = [
     ],
   },
 ];
+
 // eslint-disable-next-line @next/next/no-async-client-component
 interface MenuProps {
   role: string;
 }
+
 const Menu = ({ role }: MenuProps) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const signOut = async () => {
     try {
-      setLoading(true); // nếu có loading state
+      setLoading(true);
 
       // Gọi API logout nếu cần
       // await logoutAPI();
@@ -125,6 +129,16 @@ const Menu = ({ role }: MenuProps) => {
     }
   };
 
+  // Function to get the correct href based on role
+  const getHrefForRole = (item: any) => {
+    // If item has teacherHref and current role is Teacher, use teacherHref
+    if (item.teacherHref && role === "Teacher") {
+      return item.teacherHref;
+    }
+    // Otherwise use default href
+    return item.href;
+  };
+
   return (
     <div className="mt-4 text-sm">
       {menuItems.map((i) => (
@@ -134,12 +148,10 @@ const Menu = ({ role }: MenuProps) => {
           </span>
           {i.items.map((item) => {
             if (item.visible.includes(role)) {
+              const itemHref = getHrefForRole(item);
+
               return (
-                <Link
-                  href={item.href}
-                  key={item.label}
-                  // className=""
-                >
+                <Link href={itemHref} key={item.label}>
                   <div
                     onClick={
                       item.href === "/logout" ? () => signOut() : undefined
