@@ -12,31 +12,37 @@ const menuItems = [
       {
         icon: "/home.png",
         label: "Home",
+        href: "/admin",
+        visible: ["Administrator"],
+      },
+      {
+        icon: "/home.png",
+        label: "Home",
         href: "/",
-        visible: ["Administrator", "Teacher", "student", "parent"],
+        visible: ["Teacher", "student", "parent"],
       },
       {
         icon: "/teacher.png",
         label: "Teachers",
-        href: "/list/teachers",
+        href: "/admin/teachers",
         visible: ["Administrator"],
       },
       {
         icon: "/student.png",
         label: "Students",
-        href: "/list/students",
+        href: "/admin/students",
         visible: ["Administrator"],
       },
-      {
-        icon: "/subject.png",
-        label: "Subjects",
-        href: "/list/subjects",
-        visible: ["Administrator"],
-      },
+      // {
+      //   icon: "/subject.png",
+      //   label: "Subjects",
+      //   href: "/list/subjects",
+      //   visible: ["Administrator"],
+      // },
       {
         icon: "/class.png",
         label: "Classes",
-        href: "/list/room", // Default for Administrator
+        href: "/admin/courses", // Default for Administrator
         teacherHref: "/teacher/classes", // Special href for Teacher
         visible: ["Administrator", "Teacher"],
       },
@@ -52,46 +58,34 @@ const menuItems = [
         href: "/student/courses",
         visible: ["student"],
       },
-      // {
-      //   icon: "/exam.png",
-      //   label: "Exams",
-      //   href: "/list/exams",
-      //   visible: ["Administrator", "Teacher", "student", "parent"],
-      // },
-      // {
-      //   icon: "/assignment.png",
-      //   label: "Assignments",
-      //   href: "/list/assignments",
-      //   visible: ["Administrator", "Teacher", "student", "parent"],
-      // },
-      // {
-      //   icon: "/result.png",
-      //   label: "Results",
-      //   href: "/list/results",
-      //   visible: ["Administrator", "Teacher", "student", "parent"],
-      // },
+      {
+        icon: "/sort.png",
+        label: "Statistics",
+        href: "/admin/statistics", // Default for Administrator
+        visible: ["Administrator"],
+      },
     ],
   },
   {
     title: "OTHER",
     items: [
-      {
-        icon: "/profile.png",
-        label: "Profile",
-        href: "/profile",
-        visible: ["Administrator", "Teacher", "student", "parent"],
-      },
-      {
-        icon: "/setting.png",
-        label: "Settings",
-        href: "/settings",
-        visible: ["Administrator", "Teacher", "student", "parent"],
-      },
+      // {
+      //   icon: "/profile.png",
+      //   label: "Profile",
+      //   href: "/profile",
+      //   visible: ["Administrator", "Teacher", "Student", "parent"],
+      // },
+      // {
+      //   icon: "/setting.png",
+      //   label: "Settings",
+      //   href: "/settings",
+      //   visible: ["Administrator", "Teacher", "Student", "parent"],
+      // },
       {
         icon: "/logout.png",
         label: "Logout",
         href: "/logout",
-        visible: ["Administrator", "Teacher", "student", "parent"],
+        visible: ["Administrator", "Teacher", "Student", "parent"],
       },
     ],
   },
