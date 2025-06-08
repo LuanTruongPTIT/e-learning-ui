@@ -1,473 +1,436 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, UserPlus, Search, Eye, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
-  UserCheck,
-  Search,
-  Plus,
-  Edit2,
-  Trash2,
-  Eye,
-  Mail,
-  Phone,
-  Calendar,
-  Award,
-} from "lucide-react";
-import { adminApi, Teacher } from "@/lib/api";
-import { useRouter } from "next/navigation";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { adminApi } from "@/lib/api";
+import CreateTeacherModal from "@/components/admin/CreateTeacherModal";
 
-export default function TeachersManagement() {
+interface Teacher {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  department: string;
+  specialization: string;
+  joinDate: string;
+  status: string;
+  studentsCount: number;
+  coursesCount: number;
+  avatar?: string;
+}
+
+export default function AdminTeachersPage() {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
-  useEffect(() => {
-    fetchTeachers();
-  }, []);
-
+  // Fetch teachers data
   const fetchTeachers = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Call real API
-      const response = await adminApi.getTeachers({
+      const params = {
+        page: currentPage,
+        pageSize: 10,
         searchTerm: searchTerm || undefined,
-        status: filterStatus !== "all" ? filterStatus : undefined,
-        page: 1,
-        pageSize: 100,
-      });
+        status: statusFilter !== "all" ? statusFilter : undefined,
+        department: departmentFilter !== "all" ? departmentFilter : undefined,
+      };
 
-      if (response.status === 200 && response.data) {
-        setTeachers(response.data.teachers || []);
-      } else {
-        throw new Error(response.message || "Failed to fetch teachers");
+      const response = await adminApi.getTeachers(params);
+      if (response.data) {
+        // Transform API response to match our interface
+        const transformedTeachers: Teacher[] =
+          response.data.teachers?.map((teacher: any) => ({
+            id: teacher.id,
+            name: teacher.name,
+            email: teacher.email,
+            phone: teacher.phone || "N/A",
+            department: teacher.department || "Chưa xác định",
+            specialization: teacher.specialization || "Chưa xác định",
+            joinDate: teacher.joinDate,
+            status: teacher.status,
+            studentsCount: teacher.studentsCount || 0,
+            coursesCount: teacher.coursesCount || 0,
+            avatar: teacher.avatar,
+          })) || [];
+
+        setTeachers(transformedTeachers);
+        setTotalPages(response.data.totalPages || 1);
+        setTotalCount(response.data.totalCount || 0);
       }
-    } catch (error: unknown) {
-      console.error("Error fetching teachers:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Có lỗi xảy ra khi tải danh sách giáo viên";
-      setError(errorMessage);
-
-      // Fallback to mock data if API fails
-      const mockTeachers: Teacher[] = [
-        {
-          id: "1",
-          name: "Nguyễn Thị Mai",
-          email: "nguyen.thi.mai@school.edu",
-          phoneNumber: "0123456789",
-          department: "Công nghệ thông tin",
-          joinDate: "2020-08-15",
-          status: "Active",
-          coursesCount: 3,
-          studentsCount: 85,
-          rating: 4.8,
-        },
-        {
-          id: "2",
-          name: "Trần Văn Nam",
-          email: "tran.van.nam@school.edu",
-          phoneNumber: "0987654321",
-          department: "Toán học",
-          joinDate: "2019-03-10",
-          status: "Active",
-          coursesCount: 2,
-          studentsCount: 65,
-          rating: 4.6,
-        },
-        {
-          id: "3",
-          name: "Lê Thị Hoa",
-          email: "le.thi.hoa@school.edu",
-          phoneNumber: "0369852147",
-          department: "Tiếng Anh",
-          joinDate: "2021-09-01",
-          status: "On Leave",
-          coursesCount: 1,
-          studentsCount: 30,
-          rating: 4.9,
-        },
-      ];
-      setTeachers(mockTeachers);
+    } catch (err) {
+      console.error("API Error:", err);
+      setError("Lỗi khi tải dữ liệu");
+      // Fallback to mock data for demo
+      setTeachers(mockTeachersData);
+      setTotalPages(2);
+      setTotalCount(15);
     } finally {
       setLoading(false);
     }
   };
 
-  // Re-fetch when search or filter changes
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchTeachers();
-    }, 500); // Debounce search
+    fetchTeachers();
+  }, [currentPage, searchTerm, statusFilter, departmentFilter]);
 
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm, filterStatus]);
+  const handleSearch = () => {
+    setCurrentPage(1);
+    fetchTeachers();
+  };
 
-  const filteredTeachers = teachers.filter((teacher) => {
-    const matchesSearch =
-      teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      teacher.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      teacher.department.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter =
-      filterStatus === "all" || teacher.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
+  const handleCreateSuccess = () => {
+    fetchTeachers(); // Refresh data after creating new teacher
+  };
 
-  const getStatusBadge = (status: string) => {
-    const baseClasses =
-      "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium";
-    switch (status) {
-      case "Active":
-        return `${baseClasses} bg-green-100 text-green-800`;
-      case "Inactive":
-        return `${baseClasses} bg-gray-100 text-gray-800`;
-      case "On Leave":
-        return `${baseClasses} bg-yellow-100 text-yellow-800`;
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "inactive":
+        return "bg-red-100 text-red-800";
+      case "on_leave":
+        return "bg-yellow-100 text-yellow-800";
       default:
-        return `${baseClasses} bg-gray-100 text-gray-800`;
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  const handleDeleteTeacher = async (teacherId: string) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa giáo viên này?")) {
-      try {
-        setTeachers(teachers.filter((t) => t.id !== teacherId));
-        alert("Xóa giáo viên thành công!");
-      } catch (error) {
-        console.error("Error deleting teacher:", error);
-        alert("Có lỗi xảy ra khi xóa giáo viên!");
-      }
-    }
-  };
-
-  const getRatingStars = (rating: number) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    const stars = [];
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push("★");
-    }
-    if (hasHalfStar) {
-      stars.push("☆");
-    }
-
-    return stars.join("") + ` (${rating.toFixed(1)})`;
-  };
+  const mockTeachersData: Teacher[] = [
+    {
+      id: "1",
+      name: "Nguyễn Thành Nam",
+      email: "nam.nguyen@teacher.com",
+      phone: "0901234567",
+      department: "Công nghệ thông tin",
+      specialization: "Kỹ thuật phần mềm",
+      joinDate: "2020-09-01",
+      status: "Active",
+      studentsCount: 45,
+      coursesCount: 3,
+      avatar: "/avatars/teacher1.jpg",
+    },
+    {
+      id: "2",
+      name: "Trần Thị Mai",
+      email: "mai.tran@teacher.com",
+      phone: "0902345678",
+      department: "Công nghệ thông tin",
+      specialization: "Trí tuệ nhân tạo",
+      joinDate: "2019-08-15",
+      status: "Active",
+      studentsCount: 38,
+      coursesCount: 2,
+      avatar: "/avatars/teacher2.jpg",
+    },
+    {
+      id: "3",
+      name: "Lê Văn Tuấn",
+      email: "tuan.le@teacher.com",
+      phone: "0903456789",
+      department: "Công nghệ thông tin",
+      specialization: "An toàn thông tin",
+      joinDate: "2021-01-10",
+      status: "On_Leave",
+      studentsCount: 25,
+      coursesCount: 2,
+      avatar: "/avatars/teacher3.jpg",
+    },
+  ];
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="container mx-auto py-6 space-y-6">
+        <div className="flex items-center justify-center py-12">
+          <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <div className="flex">
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
-                Lỗi khi tải dữ liệu
-              </h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{error}</p>
-                <p className="mt-1">Đang hiển thị dữ liệu mẫu.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
+    <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
-      <div className="sm:flex sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Quản lý Giáo viên
-          </h1>
-          <p className="mt-2 text-sm text-gray-700">
-            Quản lý thông tin và hoạt động của giáo viên trong hệ thống
-          </p>
-        </div>
-        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Thêm giáo viên
-          </button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-4">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <UserCheck className="h-6 w-6 text-gray-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Tổng giáo viên
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {teachers.length}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <UserCheck className="h-6 w-6 text-green-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Đang hoạt động
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {teachers.filter((t) => t.status === "Active").length}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Award className="h-6 w-6 text-yellow-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Đánh giá TB
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {teachers.length > 0
-                      ? (
-                          teachers.reduce((sum, t) => sum + t.rating, 0) /
-                          teachers.length
-                        ).toFixed(1)
-                      : "0.0"}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <UserCheck className="h-6 w-6 text-blue-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Tổng sinh viên
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {teachers.reduce((sum, t) => sum + t.studentsCount, 0)}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters and Search */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <div className="sm:flex sm:items-center sm:space-x-4">
-            <div className="flex-1">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm theo tên, email hoặc khoa..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
-            </div>
-            <div className="mt-4 sm:mt-0">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-              >
-                <option value="all">Tất cả trạng thái</option>
-                <option value="Active">Hoạt động</option>
-                <option value="Inactive">Không hoạt động</option>
-                <option value="On Leave">Nghỉ phép</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Teachers Table */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Giáo viên
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Liên hệ
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Khoa
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Trạng thái
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Thống kê
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Đánh giá
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ngày vào làm
-                </th>
-                <th className="relative px-6 py-3">
-                  <span className="sr-only">Thao tác</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredTeachers.map((teacher) => (
-                <tr key={teacher.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                          <span className="text-green-600 font-medium text-sm">
-                            {teacher.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .slice(0, 2)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {teacher.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          ID: {teacher.id}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 flex items-center">
-                      <Mail className="h-4 w-4 mr-1 text-gray-400" />
-                      {teacher.email}
-                    </div>
-                    <div className="text-sm text-gray-500 flex items-center mt-1">
-                      <Phone className="h-4 w-4 mr-1 text-gray-400" />
-                      {teacher.phoneNumber}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {teacher.department}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={getStatusBadge(teacher.status)}>
-                      {teacher.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div>{teacher.coursesCount} khóa học</div>
-                    <div className="text-gray-500">
-                      {teacher.studentsCount} sinh viên
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex items-center">
-                      <Award className="h-4 w-4 mr-1 text-yellow-400" />
-                      <span className="text-yellow-600 font-medium">
-                        {getRatingStars(teacher.rating)}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1 text-gray-400" />
-                      {new Date(teacher.joinDate).toLocaleDateString("vi-VN")}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() =>
-                          router.push(`/admin/teachers/${teacher.id}`)
-                        }
-                        className="text-blue-600 hover:text-blue-900 p-1"
-                        title="Xem chi tiết"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button className="text-yellow-600 hover:text-yellow-900">
-                        <Edit2 className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteTeacher(teacher.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {filteredTeachers.length === 0 && (
-          <div className="text-center py-12">
-            <UserCheck className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              Không có giáo viên nào
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {searchTerm || filterStatus !== "all"
-                ? "Không tìm thấy giáo viên nào phù hợp với bộ lọc."
-                : "Bắt đầu bằng cách thêm giáo viên mới."}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Link href="/admin">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Quay lại
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold">Quản lý Giảng viên</h1>
+            <p className="text-muted-foreground">
+              Quản lý thông tin và tài khoản giảng viên
             </p>
           </div>
-        )}
+        </div>
+        <Button onClick={() => setShowCreateModal(true)}>
+          <UserPlus className="h-4 w-4 mr-2" />
+          Thêm Giảng viên
+        </Button>
       </div>
+
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Tổng giảng viên
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalCount}</div>
+            <p className="text-xs text-muted-foreground">
+              +8% so với tháng trước
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Đang hoạt động
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {teachers.filter((t) => t.status === "Active").length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {teachers.length > 0
+                ? Math.round(
+                    (teachers.filter((t) => t.status === "Active").length /
+                      teachers.length) *
+                      100
+                  )
+                : 0}
+              % tổng số
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Nghỉ phép</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {teachers.filter((t) => t.status === "On_Leave").length}
+            </div>
+            <p className="text-xs text-muted-foreground">Tạm thời</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Giảng viên mới
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">5</div>
+            <p className="text-xs text-muted-foreground">Trong tháng này</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Bộ lọc</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <Input
+                placeholder="Tìm kiếm theo tên, email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Trạng thái" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                <SelectItem value="Active">Đang hoạt động</SelectItem>
+                <SelectItem value="Inactive">Tạm ngưng</SelectItem>
+                <SelectItem value="On_Leave">Nghỉ phép</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={departmentFilter}
+              onValueChange={setDepartmentFilter}
+            >
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Khoa" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả khoa</SelectItem>
+                <SelectItem value="Công nghệ thông tin">
+                  Công nghệ thông tin
+                </SelectItem>
+                <SelectItem value="Kinh tế">Kinh tế</SelectItem>
+                <SelectItem value="Kỹ thuật">Kỹ thuật</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button onClick={handleSearch}>
+              <Search className="h-4 w-4 mr-2" />
+              Tìm kiếm
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Error Display */}
+      {error && (
+        <Card className="border-yellow-200 bg-yellow-50">
+          <CardContent className="pt-6">
+            <p className="text-yellow-800">{error} - Hiển thị dữ liệu demo</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Teachers Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Danh sách Giảng viên</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Giảng viên</TableHead>
+                <TableHead>Khoa</TableHead>
+                {/* <TableHead>Chuyên môn</TableHead> */}
+                <TableHead>Sinh viên</TableHead>
+                <TableHead>Trạng thái</TableHead>
+                <TableHead>Thao tác</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {teachers.map((teacher) => (
+                <TableRow key={teacher.id}>
+                  <TableCell>
+                    <div className="flex items-center space-x-3">
+                      <Avatar>
+                        <AvatarImage src={teacher.avatar} />
+                        <AvatarFallback>
+                          {teacher.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">{teacher.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {teacher.email}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {teacher.phone}
+                        </div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{teacher.department}</TableCell>
+                  {/* <TableCell>{teacher.specialization}</TableCell> */}
+                  <TableCell>
+                    <div className="text-sm">
+                      <div>{teacher.studentsCount} sinh viên</div>
+                      <div className="text-muted-foreground">
+                        {teacher.coursesCount} môn học
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(teacher.status)}>
+                      {teacher.status === "Active"
+                        ? "Hoạt động"
+                        : teacher.status === "Inactive"
+                        ? "Tạm ngưng"
+                        : teacher.status === "On_Leave"
+                        ? "Nghỉ phép"
+                        : teacher.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Link href={`/admin/teachers/${teacher.id}`}>
+                      <Button variant="ghost" size="sm">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          Hiển thị {(currentPage - 1) * 10 + 1} -{" "}
+          {Math.min(currentPage * 10, totalCount)} của {totalCount} giảng viên
+        </p>
+        <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+          >
+            Trước
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+            }
+            disabled={currentPage === totalPages}
+          >
+            Sau
+          </Button>
+        </div>
+      </div>
+
+      {/* Create Teacher Modal */}
+      <CreateTeacherModal
+        open={showCreateModal}
+        onOpenChange={setShowCreateModal}
+        onSuccess={handleCreateSuccess}
+      />
     </div>
   );
 }
