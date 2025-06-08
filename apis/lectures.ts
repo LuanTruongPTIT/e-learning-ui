@@ -10,7 +10,7 @@ export interface IApiResponse<T> {
 export interface CreateLectureRequest {
   title: string;
   description: string;
-  content_type: "VIDEO_UPLOAD" | "YOUTUBE_LINK";
+  content_type: "FILE_UPLOAD" | "YOUTUBE_LINK";
   content_url: string;
   youtube_video_id?: string;
   duration?: number;

@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, BookOpen, Loader2 } from "lucide-react";
 import CourseCard from "@/components/CourseCard";
 import { getEnrolledCourses, EnrolledCourse } from "@/apis/student-courses";
+import Link from "next/link";
 
 // Mock data for enrolled courses
 // const mockEnrolledCourses = [
@@ -158,6 +159,9 @@ export default function StudentCoursesPage() {
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">My Courses</h1>
+        <Link href="/student/dashboard">
+          <Button>Back to Dashboard</Button>
+        </Link>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 justify-between">

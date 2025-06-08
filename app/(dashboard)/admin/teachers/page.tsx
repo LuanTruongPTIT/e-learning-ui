@@ -74,7 +74,7 @@ export default function AdminTeachersPage() {
             id: teacher.id,
             name: teacher.name,
             email: teacher.email,
-            phone: teacher.phone || "N/A",
+            phone: teacher.phoneNumber || "N/A",
             department: teacher.department || "Chưa xác định",
             specialization: teacher.specialization || "Chưa xác định",
             joinDate: teacher.joinDate,

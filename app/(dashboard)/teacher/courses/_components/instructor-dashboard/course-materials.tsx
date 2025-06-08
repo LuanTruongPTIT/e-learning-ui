@@ -168,9 +168,9 @@ export default function CourseMaterials({ courseId }: CourseMaterialsProps) {
     )
     .sort((a: Lecture, b: Lecture) => {
       if (sortBy === "created_at") {
-        return sortOrder === "asc"
-          ? a.created_at.getTime() - b.created_at.getTime()
-          : b.created_at.getTime() - a.created_at.getTime();
+        const aTime = new Date(a.created_at).getTime();
+        const bTime = new Date(b.created_at).getTime();
+        return sortOrder === "asc" ? aTime - bTime : bTime - aTime;
       } else if (sortBy === "title") {
         return sortOrder === "asc"
           ? a.title.localeCompare(b.title)
@@ -246,7 +246,7 @@ export default function CourseMaterials({ courseId }: CourseMaterialsProps) {
         description: uploadForm.description || "",
         content_url: fileUrl,
         content_type:
-          uploadForm.uploadType === "youtube" ? "YOUTUBE_LINK" : "VIDEO_UPLOAD",
+          uploadForm.uploadType === "youtube" ? "YOUTUBE_LINK" : "FILE_UPLOAD",
         youtube_video_id: youtubeVideoId || undefined,
         duration: uploadForm.uploadType === "file" ? 0 : 0, // Placeholder, actual duration would be determined later
         is_published: uploadForm.is_published,

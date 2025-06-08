@@ -308,7 +308,7 @@ export default function CourseDetailsPage() {
             <div className="flex flex-wrap gap-4 text-sm">
               <div className="flex items-center gap-1">
                 <User className="h-4 w-4 text-muted-foreground" />
-                <span>Instructor: {course.instructor.teacher_name}</span>
+                <span>Instructor: {course.instructor.teacherName}</span>
               </div>
               <div className="flex items-center gap-1">
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
@@ -320,7 +320,7 @@ export default function CourseDetailsPage() {
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>Last updated: {formatDate(course.updated_at)}</span>
+                <span>Last updated: {formatDate(course.updatedAt)}</span>
               </div>
             </div>
           </div>
@@ -435,12 +435,12 @@ export default function CourseDetailsPage() {
                         <div>
                           <div className="font-medium">{resource.title}</div>
                           <div className="text-xs text-muted-foreground">
-                            {resource.content_type.toUpperCase()}
+                            {resource.contentType.toUpperCase()}
                           </div>
                         </div>
                       </div>
                       <Button variant="outline" size="sm" asChild>
-                        <Link href={resource.content_url}>
+                        <Link href={resource.contentUrl}>
                           <Download className="h-4 w-4 mr-1" />
                           Download
                         </Link>
@@ -473,14 +473,14 @@ export default function CourseDetailsPage() {
                 <div className="relative h-12 w-12 rounded-full overflow-hidden">
                   <Image
                     src={course.instructor.avatar}
-                    alt={course.instructor.teacher_name}
+                    alt={course.instructor.teacherName}
                     fill
                     className="object-cover"
                   />
                 </div>
                 <div>
                   <h3 className="font-medium">
-                    {course.instructor.teacher_name}
+                    {course.instructor.teacherName}
                   </h3>
                 </div>
               </div>

@@ -3,10 +3,8 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -15,14 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-import { CalendarIcon, Upload, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Upload, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -48,6 +39,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { UploadButton } from "@/lib/uploadthing";
 
 interface CreateTeacherModalProps {
   open: boolean;
@@ -70,6 +62,7 @@ export default function CreateTeacherModal({
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [subjectsAPI, setSubjectsAPI] = useState<Subject[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<TeacherFormValues>({
     resolver: zodResolver(teacherFormSchema),
@@ -80,6 +73,10 @@ export default function CreateTeacherModal({
       address: "",
       username: "",
       password: "",
+      birthday: new Date(),
+      gender: "1", // Default to male
+      status: "1", // Default to active
+      employmentDate: new Date(), // Default to today
       subjects: [],
     },
   });
@@ -122,26 +119,15 @@ export default function CreateTeacherModal({
 
   const uniqueDepartments = Array.from(uniqueDepartmentsMap.values());
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      form.setValue("avatar", file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const onSubmit = async (data: TeacherFormValues) => {
+    console.log("🎯 FORM SUBMIT TRIGGERED!");
     console.log("Submitted data:", data);
     try {
       setIsSubmitting(true);
 
       const response = await CreateTeacher(data);
 
-      console.log("Form data prepared for API submission:", data);
+      console.log("API Response:", response);
       if (response.status === 200) {
         toast.success("Giảng viên được tạo thành công!");
         form.reset();
@@ -155,6 +141,14 @@ export default function CreateTeacherModal({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Debug function to check form errors
+  const handleDebugClick = () => {
+    console.log("🔍 FORM DEBUG:");
+    console.log("Form Values:", form.getValues());
+    console.log("Form Errors:", form.formState.errors);
+    console.log("Form Valid:", form.formState.isValid);
   };
 
   return (
@@ -181,7 +175,7 @@ export default function CreateTeacherModal({
                   name="fullName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Họ và tên</FormLabel>
+                      <FormLabel>Họ và tên *</FormLabel>
                       <FormControl>
                         <Input placeholder="Nhập họ và tên" {...field} />
                       </FormControl>
@@ -195,7 +189,7 @@ export default function CreateTeacherModal({
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>Email *</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
@@ -213,7 +207,7 @@ export default function CreateTeacherModal({
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tên đăng nhập</FormLabel>
+                      <FormLabel>Tên đăng nhập *</FormLabel>
                       <FormControl>
                         <Input placeholder="Nhập tên đăng nhập" {...field} />
                       </FormControl>
@@ -227,11 +221,11 @@ export default function CreateTeacherModal({
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Mật khẩu</FormLabel>
+                      <FormLabel>Mật khẩu *</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Nhập mật khẩu"
+                          placeholder="Nhập mật khẩu (tối thiểu 8 ký tự)"
                           {...field}
                         />
                       </FormControl>
@@ -256,41 +250,104 @@ export default function CreateTeacherModal({
 
                 <FormField
                   control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Giới tính *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Chọn giới tính" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="1">Nam</SelectItem>
+                          <SelectItem value="2">Nữ</SelectItem>
+                          <SelectItem value="3">Khác</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="birthday"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Ngày sinh</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Chọn ngày sinh</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                    <FormItem>
+                      <FormLabel>Ngày sinh *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          value={
+                            field.value instanceof Date
+                              ? field.value.toISOString().split("T")[0]
+                              : field.value
+                          }
+                          onChange={(e) => {
+                            const dateValue = e.target.value;
+                            field.onChange(
+                              dateValue ? new Date(dateValue) : new Date()
+                            );
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="employmentDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ngày nhận việc *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          value={
+                            field.value instanceof Date
+                              ? field.value.toISOString().split("T")[0]
+                              : field.value
+                          }
+                          onChange={(e) => {
+                            const dateValue = e.target.value;
+                            field.onChange(
+                              dateValue ? new Date(dateValue) : new Date()
+                            );
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Trạng thái *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Chọn trạng thái" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="1">Hoạt động</SelectItem>
+                          <SelectItem value="2">Tạm ngưng</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -327,7 +384,7 @@ export default function CreateTeacherModal({
                   name="department"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Khoa</FormLabel>
+                      <FormLabel>Khoa *</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -360,7 +417,7 @@ export default function CreateTeacherModal({
                     <FormItem>
                       <div className="mb-4">
                         <FormLabel className="text-base">
-                          Môn học phụ trách
+                          Môn học phụ trách *
                         </FormLabel>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
@@ -411,7 +468,7 @@ export default function CreateTeacherModal({
               </CardContent>
             </Card>
 
-            {/* Avatar Upload */}
+            {/* Avatar Upload with Uploadthing */}
             <Card>
               <CardHeader>
                 <CardTitle>Ảnh đại diện</CardTitle>
@@ -434,25 +491,50 @@ export default function CreateTeacherModal({
                     )}
                   </div>
                   <div className="flex-1">
-                    <Label
-                      htmlFor="avatar-upload"
-                      className="cursor-pointer inline-flex items-center gap-2 bg-secondary hover:bg-secondary/80 px-4 py-2 rounded-md transition-colors"
-                    >
-                      <Upload className="w-4 h-4" />
-                      Chọn ảnh
-                    </Label>
-                    <Input
-                      id="avatar-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarChange}
-                      className="hidden"
+                    <UploadButton
+                      endpoint="teacherAvatar"
+                      onClientUploadComplete={(res: { url: string }[]) => {
+                        if (res && res[0]) {
+                          const fileUrl = res[0].url;
+                          setAvatarPreview(fileUrl);
+                          form.setValue("avatar", fileUrl);
+                          toast.success("Ảnh đã được tải lên thành công!");
+                          setIsUploading(false);
+                        }
+                      }}
+                      onUploadError={(error: Error) => {
+                        console.error("Upload error:", error);
+                        toast.error("Lỗi khi tải ảnh lên. Vui lòng thử lại.");
+                        setIsUploading(false);
+                      }}
+                      onUploadBegin={() => {
+                        setIsUploading(true);
+                      }}
+                      appearance={{
+                        button:
+                          "ut-ready:bg-primary ut-uploading:cursor-not-allowed bg-primary after:bg-primary",
+                        allowedContent: "text-xs text-muted-foreground",
+                      }}
                     />
                     <p className="text-sm text-muted-foreground mt-2">
-                      JPG, PNG hoặc GIF (tối đa 5MB)
+                      JPG, PNG hoặc GIF (tối đa 4MB)
                     </p>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Debug Button */}
+            <Card className="border-dashed border-orange-300 bg-orange-50">
+              <CardContent className="pt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleDebugClick}
+                  className="w-full"
+                >
+                  🔍 Debug Form State (Check Console)
+                </Button>
               </CardContent>
             </Card>
 
@@ -464,7 +546,7 @@ export default function CreateTeacherModal({
               >
                 Hủy
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting || isUploading}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

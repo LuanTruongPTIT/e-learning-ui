@@ -116,10 +116,9 @@ CourseDetailViewProps) {
             <span className="font-medium text-gray-700">Class:</span>{" "}
             {course.class_name}
           </div>
-          <div className="mt-1 text-sm">
+          {/* <div className="mt-1 text-sm">
             <span className="font-medium text-gray-700">Assigned by:</span>{" "}
-            {/* {course.assignedBy} on {format(course.createdAt, "MMM d, yyyy")} */}
-          </div>
+          </div> */}
         </div>
         <div className="w-full md:w-1/3 flex flex-col sm:flex-row md:flex-col gap-4">
           <div className="flex items-center bg-white p-3 rounded-lg shadow-sm flex-1">
@@ -162,14 +161,14 @@ CourseDetailViewProps) {
             <BookOpen className="h-4 w-4" />
             <span className="hidden sm:inline">Assignments</span>
           </TabsTrigger>
-          <TabsTrigger
+          {/* <TabsTrigger
             value="teaching-plans"
             className="flex items-center gap-2 data-[state=active]:bg-white"
           >
             <Calendar className="h-4 w-4" />
             <span className="hidden sm:inline">Teaching Plans</span>
-          </TabsTrigger>
-          <TabsTrigger
+          </TabsTrigger> */}
+          {/* <TabsTrigger
             value="students"
             className="flex items-center gap-2 data-[state=active]:bg-white"
           >
@@ -182,7 +181,7 @@ CourseDetailViewProps) {
           >
             <Settings className="h-4 w-4" />
             <span className="hidden sm:inline">Information</span>
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="materials" className="space-y-4">

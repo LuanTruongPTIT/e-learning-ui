@@ -18,6 +18,17 @@ export const ourFileRouter = {
       // Nếu bạn muốn lưu file.url vào database thì xử lý tại đây
     }),
 
+  // Add support for teacher avatar upload
+  teacherAvatar: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
+    .middleware(async () => {
+      // Middleware dùng để xử lý xác thực hoặc thêm metadata (nếu cần)
+      return {};
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Teacher avatar upload complete:", file);
+      // Database operations would be handled in the frontend after upload
+    }),
+
   // Add support for course materials
   courseMaterial: f({
     pdf: { maxFileSize: "16MB", maxFileCount: 1 },

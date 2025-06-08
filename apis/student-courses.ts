@@ -25,15 +25,15 @@ export interface Section {
 }
 
 export interface Instructor {
-  teacher_name: string;
+  teacherName: string;
   avatar: string;
 }
 
 export interface Resource {
   id: string;
   title: string;
-  content_type: string;
-  content_url: string;
+  contentType: string;
+  contentUrl: string;
 }
 
 export interface Announcement {
