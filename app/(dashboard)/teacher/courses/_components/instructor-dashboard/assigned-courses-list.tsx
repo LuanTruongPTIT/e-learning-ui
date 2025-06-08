@@ -220,22 +220,19 @@ export default function AssignedCoursesList({
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     <Users className="h-4 w-4 mr-1 text-primary" />
-                    {/* <span>{course.students_count || 0} students</span> */}
                     <span>0 students</span>
                   </div>
                   <div className="flex items-center">
                     <FileText className="h-4 w-4 mr-1 text-primary" />
-                    {/* <span>{course.materials_count || 0} materials</span> */}
                     <span>0 materials</span>
-                  </div>
+                  </div> */}
                 </div>
-                <div className="mt-2 text-xs text-muted-foreground">
+                {/* <div className="mt-2 text-xs text-muted-foreground">
                   <span className="font-medium">Department:</span>{" "}
-                  {/* {course.department || "N/A"} */}
                   N/A
-                </div>
+                </div> */}
               </CardContent>
               <CardFooter className="border-t pt-3 text-xs text-muted-foreground">
                 <div className="flex items-center">
